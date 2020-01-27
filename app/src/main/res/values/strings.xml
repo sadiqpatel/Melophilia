@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Melophilia</string>
+    <string name="app_quote">Good music makes good life.</string>
+
+    <string name="email">\u0020\u0020\u0020\u0020\u0020Email ID</string>
+    <string name="password">\u0020\u0020\u0020\u0020\u0020Password</string>
+    <string name="username">USERNAME</string>
+    <string name="no_account">Dont\'t have an account?</string>
+    <string name="have_account">Already have an account?</string>
+
+
+    <string name="signIn"><b>SIGN IN</b></string>
+    <string name="signUp"><b>SIGN UP</b></string>
+
+    <string name="register">Register</string>
+    <string name="reset">Send Reset Mail</string>
+    <string name="forgot_passwrord"><u>Forgot password?</u></string>
+    <string name="admin"><u>Admin</u></string>
+    <string name="user"><u>Home</u></string>
+
+
+    <!-- Validations -->
+    <string name="empty_email">Enter Email Address</string>
+    <string name="empty_password">Enter Password</string>
+    <string name="empty_username">Enter Username</string>
+    <string name="emailPattern">[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+</string>
+</resources>

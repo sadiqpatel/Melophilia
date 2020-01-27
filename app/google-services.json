@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "523197350622",
+    "firebase_url": "https://melophilia-8f7a9.firebaseio.com",
+    "project_id": "melophilia-8f7a9",
+    "storage_bucket": "melophilia-8f7a9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:523197350622:android:69b30da5eecb9d0994784f",
+        "android_client_info": {
+          "package_name": "com.example.melophilia"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "523197350622-a05n49s5mih6r3j22v5ua5s4dl3dupvu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsvvPhGF8CA_uV5jxw7xCLHfqyO9XH1Q8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "523197350622-a05n49s5mih6r3j22v5ua5s4dl3dupvu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
