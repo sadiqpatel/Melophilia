@@ -42,7 +42,6 @@ public class registerActivity extends AppCompatActivity implements View.OnClickL
         et_registerPassword = findViewById(R.id.et_registerPassword);
         tv_signIn = findViewById(R.id.tv_signin);
         tv_signIn.setOnClickListener(this);
-
         bt_signUp.setOnClickListener(this);
 
     }
@@ -62,7 +61,7 @@ public class registerActivity extends AppCompatActivity implements View.OnClickL
                                             if (task.isSuccessful()) {
                                                 progressDialog.dismiss();
                                                 Toast.makeText(registerActivity.this, "Registered Successfully. Please Check you email for verification", Toast.LENGTH_SHORT).show();
-                                                startActivity(new Intent(registerActivity.this, loginActicity.class));
+                                                startActivity(new Intent(registerActivity.this, loginActivity.class));
                                             } else {
                                                 progressDialog.dismiss();
                                                 Toast.makeText(registerActivity.this, task.getException().getLocalizedMessage(), Toast.LENGTH_SHORT).show();
@@ -84,12 +83,20 @@ public class registerActivity extends AppCompatActivity implements View.OnClickL
                 });
     }
 
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(registerActivity.this, authenticationActivity.class));
+
+    }
+
     @Override
     public void onClick(View view) {
         if (view == bt_signUp) {
             validate();
         } else if (view == tv_signIn) {
-            startActivity(new Intent(registerActivity.this, loginActicity.class));
+            startActivity(new Intent(registerActivity.this, loginActivity.class));
         }
     }
 

@@ -59,7 +59,7 @@ public class forgotPasswordActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             progressDialog.dismiss();
                             Toast.makeText(forgotPasswordActivity.this, "Password Reset Mail Sent Successfully", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(forgotPasswordActivity.this, loginActicity.class));
+                            startActivity(new Intent(forgotPasswordActivity.this, loginActivity.class));
                         } else {
                             progressDialog.dismiss();
                             Toast.makeText(forgotPasswordActivity.this, "Error", Toast.LENGTH_SHORT).show();

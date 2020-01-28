@@ -17,7 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.melophilia.Admin.adminHome;
-import com.example.melophilia.MainActivity;
 import com.example.melophilia.R;
 import com.example.melophilia.User.userHome;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -25,7 +24,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class loginActicity extends AppCompatActivity implements View.OnClickListener {
+public class loginActivity extends AppCompatActivity implements View.OnClickListener {
     private FirebaseAuth mAuth;
 
     ProgressDialog progressDialog;
@@ -34,9 +33,16 @@ public class loginActicity extends AppCompatActivity implements View.OnClickList
     TextView tv_signUp, tv_forgotPassword;
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(loginActivity.this,authenticationActivity.class));
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login_acticity);
+        setContentView(R.layout.activity_login_activity);
 
 
         progressDialog = new ProgressDialog(this);
@@ -53,7 +59,7 @@ public class loginActicity extends AppCompatActivity implements View.OnClickList
 
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             if (FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()) {
-                startActivity(new Intent(loginActicity.this,userHome.class));
+                startActivity(new Intent(loginActivity.this,userHome.class));
             }
         }
 
@@ -68,17 +74,17 @@ public class loginActicity extends AppCompatActivity implements View.OnClickList
                             Log.d("login1234", "email" + email);
                             if (email.equals("admin12345@gmail.com")) {
                                 progressDialog.dismiss();
-                                startActivity(new Intent(loginActicity.this, adminHome.class));
+                                startActivity(new Intent(loginActivity.this, adminHome.class));
                             } else if (mAuth.getCurrentUser().isEmailVerified()) {
                                 progressDialog.dismiss();
-                                startActivity(new Intent(loginActicity.this, userHome.class));
+                                startActivity(new Intent(loginActivity.this, userHome.class));
                             } else {
                                 progressDialog.dismiss();
-                                Toast.makeText(loginActicity.this, "Please Verify your email", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(loginActivity.this, "Please Verify your email", Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             progressDialog.dismiss();
-                            Toast.makeText(loginActicity.this, "Email or Password is incorrect.",
+                            Toast.makeText(loginActivity.this, "Email or Password is incorrect.",
                                     Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -109,9 +115,9 @@ public class loginActicity extends AppCompatActivity implements View.OnClickList
         if (view == bt_signIn) {
             validate();
         } else if (view == tv_forgotPassword) {
-            startActivity(new Intent(loginActicity.this, forgotPasswordActivity.class));
+            startActivity(new Intent(loginActivity.this, forgotPasswordActivity.class));
         } else if (view == tv_signUp) {
-            startActivity(new Intent(loginActicity.this, registerActivity.class));
+            startActivity(new Intent(loginActivity.this, registerActivity.class));
         }
     }
 

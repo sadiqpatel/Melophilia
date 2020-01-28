@@ -1,27 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorApp"
     android:orientation="vertical"
-    tools:context=".Authentication.forgotPasswordActivity">
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/confirm_order_toolbar_layout"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:theme="@style/ToolbarTheme"
-        app:titleTextAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:titleTextColor="@color/colorApp"
-        android:background="@color/colorWhite"
-        />
+    android:background="@color/colorApp"
+    tools:context=".Authentication.authenticationActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:gravity="center"
+        android:layout_weight="1"
         android:orientation="vertical">
 
         <ImageView
@@ -29,15 +19,12 @@
             android:layout_width="wrap_content"
             android:layout_height="96dp"
             android:src="@drawable/applogo"
-            android:layout_marginTop="40dp"
 
             />
-
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:text="@string/app_name"
             android:textColor="@color/colorWhite"
             android:textSize="32sp"
@@ -49,49 +36,43 @@
             android:gravity="center"
             android:text="@string/app_quote"
             android:textColor="@color/colorWhite"
-            android:textSize="16sp"
-            android:textStyle="italic|bold" />
+            android:textSize="20sp"
+            android:textStyle="italic" />
+
     </LinearLayout>
 
     <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    >
-        <EditText
-            android:id="@+id/et_forgotEmail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:hint="@string/email"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:paddingLeft="7dp"
-            android:paddingRight="5dp"
-            android:background="@drawable/bt_round_white"
-
-            />
-
-
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
 
         <Button
-            android:id="@+id/bt_sendMail"
-            android:background="@drawable/bt_round_white"
-            android:textColor="@color/colorApp"
+            android:id="@+id/bt_signin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/et_loginPassword"
+            android:background="@drawable/bt_round_white"
             android:layout_marginLeft="30dp"
-            android:layout_marginTop="30dp"
             android:layout_marginRight="30dp"
-            android:text="Send Mail"
-            android:textStyle="bold"
-            />
+
+            android:text="@string/signIn"
+            android:textColor="@color/colorApp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/bt_signup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bt_round_white"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/signUp"
+            android:textColor="@color/colorApp"
+            android:textStyle="bold" />
 
 
-
-</LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>

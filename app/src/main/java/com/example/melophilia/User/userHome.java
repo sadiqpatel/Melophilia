@@ -10,8 +10,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.example.melophilia.Admin.adminHome;
-import com.example.melophilia.Authentication.loginActicity;
+import com.example.melophilia.Authentication.loginActivity;
 import com.example.melophilia.R;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -42,7 +41,7 @@ Toolbar mActionBarToolbar;
         switch (item.getItemId()) {
             case R.id.item_logout:
                 FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(userHome.this, loginActicity.class));
+                startActivity(new Intent(userHome.this, loginActivity.class));
                 finish();
                 return true;
             default:

@@ -4,17 +4,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Admin.adminHome">
+    tools:context=".Admin.adminHome"
+    android:orientation="vertical"
+    >
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/confirm_order_toolbar_layout"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:theme="@style/ToolbarTheme"
-        app:titleTextAppearance="@style/TextAppearance.AppCompat.Large"
-        app:titleTextColor="@color/colorGrey"
-        android:background="@color/colorComponents"
+        app:titleTextAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:titleTextColor="@color/colorApp"
+        android:background="@color/colorWhite"
         />
 
-
+    <Button
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/bt_upload"
+        android:text="@string/upload"
+        />
+    <Button
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/bt_stop"
+        android:text="@string/upload"
+        />
+    <com.example.jean.jcplayer.JcPlayerView android:id="@+id/jcplayerView" android:layout_width="match_parent" android:layout_height="match_parent">
+    </com.example.jean.jcplayer.JcPlayerView>
 </LinearLayout>
