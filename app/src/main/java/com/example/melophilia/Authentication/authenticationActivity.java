@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.melophilia.R;
+import com.example.melophilia.User.userHome;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class authenticationActivity extends AppCompatActivity implements View.OnClickListener {
     Button bt_signin, bt_signup;
@@ -21,6 +23,11 @@ public class authenticationActivity extends AppCompatActivity implements View.On
         bt_signin.setOnClickListener(this);
         bt_signup.setOnClickListener(this);
 
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            if (FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()) {
+                startActivity(new Intent(authenticationActivity.this, userHome.class));
+            }
+        }
     }
 
     @Override

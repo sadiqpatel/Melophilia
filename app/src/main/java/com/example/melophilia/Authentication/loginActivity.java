@@ -57,11 +57,7 @@ public class loginActivity extends AppCompatActivity implements View.OnClickList
         tv_forgotPassword.setOnClickListener(this);
         tv_signUp.setOnClickListener(this);
 
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            if (FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()) {
-                startActivity(new Intent(loginActivity.this,userHome.class));
-            }
-        }
+
 
     }
 
