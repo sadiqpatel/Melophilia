@@ -26,5 +26,15 @@
     <string name="emailPattern">[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+</string>
 
     <string name="upload">Upload</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="choose_song">Choose Song</string>
+    <string name="add_song">Add Music</string>
+    <string name="song_writer">Song Writer</string>
+    <string name="song_title">Song Title</string>
+
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

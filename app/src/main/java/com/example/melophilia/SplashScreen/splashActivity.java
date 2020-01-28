@@ -8,7 +8,6 @@ import android.view.WindowManager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.melophilia.Authentication.authenticationActivity;
-import com.example.melophilia.MainActivity;
 import com.example.melophilia.R;
 
 public class splashActivity extends AppCompatActivity {
