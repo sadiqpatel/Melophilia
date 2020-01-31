@@ -33,23 +33,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 class LatestAlbum{
-        public String link;
-        public String name;
-        public String artist;
-
-        public LatestAlbum(){}
-
-        public LatestAlbum(String link, String name, String artist) {
-            this.name = name;
-            this.link = link;
-            this.artist = artist;
-        }
+    public LatestAlbum(String songId, String songKey, String songTitle, String songUri, String songWriter) {
+        this.songId = songId;
+        this.songKey = songKey;
+        this.songTitle = songTitle;
+        this.songUri = songUri;
+        this.songWriter = songWriter;
     }
+
+    public String songId;
+    public String songKey;
+    public String songTitle;
+    public String songUri;
+    public String songWriter;
+
+    public LatestAlbum(){}
+}
 
 public class FragHome extends Fragment {
     DatabaseReference databaseReference;
     FirebaseStorage firebaseStorage;
-    RecyclerView recyclerView;
+    RecyclerView latestAlbumRecyclerView, topSongsRecyclerView;
     MediaPlayer mediaPlayer;
     List<LatestAlbum> list;
     public static  String link;
@@ -62,8 +66,9 @@ public class FragHome extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_frag_home, container, false);
         list = new ArrayList<>();
-        databaseReference = FirebaseDatabase.getInstance().getReference("songs");
-        recyclerView = view.findViewById(R.id.fragHome_recyclerView);
+        databaseReference = FirebaseDatabase.getInstance().getReference("Audio");
+        latestAlbumRecyclerView = view.findViewById(R.id.fragHome_recyclerView);
+        topSongsRecyclerView = view.findViewById(R.id.fragHome_recyclerViewTopSongs);
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         return view;
@@ -84,17 +89,18 @@ public class FragHome extends Fragment {
                     list.add(Mod);
                 }
 
-
-
                 final HomeLatestAlbumAdapter adapterClass = new HomeLatestAlbumAdapter((Activity)getContext() , list);
-                recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
-                recyclerView.setAdapter(adapterClass);
+                final HomeTopSongsAdapter adapter = new HomeTopSongsAdapter((Activity)getContext() , list);
+                latestAlbumRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
+                topSongsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
+                latestAlbumRecyclerView.setAdapter(adapterClass);
+                topSongsRecyclerView.setAdapter(adapter);
                 link = null;
-                recyclerView.setOnClickListener(new View.OnClickListener() {
+                latestAlbumRecyclerView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         LatestAlbum modelData = list.get(v.getScrollX());
-                        link = modelData.link;
+                        link = modelData.songUri;
                         if (mediaPlayer.isPlaying()){
 
                             mediaPlayer.stop();
@@ -171,14 +177,53 @@ class HomeLatestAlbumAdapter extends RecyclerView.Adapter<HomeLatestAlbumAdapter
     @NonNull
     @Override
     public HomeLatestAlbumAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-       View view = LayoutInflater.from(context).inflate(R.layout.items_latest_albums, parent, false);
-       return new MyViewHolder(view);
+        View view = LayoutInflater.from(context).inflate(R.layout.items_latest_albums, parent, false);
+        return new MyViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull HomeLatestAlbumAdapter.MyViewHolder holder, int position) {
-        holder.textTitle.setText(latestAlbums.get(position).name);
-        holder.textAuthor.setText("("+latestAlbums.get(position).artist+")");
+        holder.textTitle.setText(latestAlbums.get(position).songTitle);
+        holder.textAuthor.setText("("+latestAlbums.get(position).songWriter+")");
+    }
+
+    @Override
+    public int getItemCount() {
+        return latestAlbums.size();
+    }
+
+    public class MyViewHolder extends RecyclerView.ViewHolder {
+        TextView textTitle, textAuthor;
+        public MyViewHolder(@NonNull View itemView) {
+            super(itemView);
+            textTitle = itemView.findViewById(R.id.latestAlbum_txtTitle);
+            textAuthor = itemView.findViewById(R.id.latestAlbum_txtAuthor);
+        }
+    }
+}
+
+class HomeTopSongsAdapter extends RecyclerView.Adapter<HomeTopSongsAdapter.MyViewHolder>{
+
+    private Activity context;
+    private List<LatestAlbum> latestAlbums;
+    String databaseReference;
+
+    public HomeTopSongsAdapter(Activity context, List<LatestAlbum> latestAlbums) {
+        this.context = context;
+        this.latestAlbums = latestAlbums;
+    }
+
+    @NonNull
+    @Override
+    public HomeTopSongsAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.item_topsongs, parent, false);
+        return new MyViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull HomeTopSongsAdapter.MyViewHolder holder, int position) {
+        holder.textTitle.setText(latestAlbums.get(position).songTitle);
+        holder.textAuthor.setText("("+latestAlbums.get(position).songWriter+")");
     }
 
     @Override

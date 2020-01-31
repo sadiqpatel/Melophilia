@@ -4,17 +4,19 @@
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_margin="10dp"
-    android:id="@+id/latestAlbum_lay">
+    android:layout_marginStart="15dp"
+    android:layout_marginTop="10dp"
+    android:id="@+id/latestAlbum_lay"
+    android:layout_marginLeft="10dp">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/latestAlbum_card"
-        android:layout_width="110dp"
-        android:layout_height="120dp"
-        app:cardCornerRadius="10dp">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="8dp">
         <LinearLayout
-            android:layout_width="110dp"
-            android:layout_height="120dp"
+            android:layout_width="145dp"
+            android:layout_height="145dp"
             android:background="@drawable/demo" />
     </androidx.cardview.widget.CardView>
     <TextView
