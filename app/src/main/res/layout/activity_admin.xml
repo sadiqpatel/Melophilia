@@ -14,8 +14,23 @@
         android:layout_height="?attr/actionBarSize"
         android:theme="@style/ToolbarTheme"
         app:titleTextAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:titleTextColor="@color/colorApp"
-        android:background="@color/colorWhite"
+        app:titleTextColor="@color/colorWhite"
+        android:background="@color/colorApp"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/confirm_order_toolbar_layout"
+        android:id="@+id/tv_songs"
+        android:text="Songs Uploaded"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:textStyle="bold"
+        android:textColor="@color/colorBlack"
+        android:background="#D6E1FC"
+        android:paddingLeft="10dp"
+
+
+
         />
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floating_action_button"
@@ -34,8 +49,9 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_height="match_parent"
-        android:layout_below="@+id/confirm_order_toolbar_layout"
         android:layout_width="match_parent"
+        android:layout_below="@+id/tv_songs"
+        android:id="@+id/rv_songList"
         />
 
 

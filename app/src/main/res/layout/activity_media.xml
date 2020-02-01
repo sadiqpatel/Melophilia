@@ -1,0 +1,114 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/confirm_order_toolbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorApp"
+        android:theme="@style/ToolbarTheme"
+        app:titleTextAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:titleTextColor="@color/colorWhite" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/applogo"
+
+        />
+
+    <LinearLayout
+        android:id="@+id/re"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="10dp"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/iv_rewind"
+            android:layout_width="58dp"
+            android:layout_height="58dp"
+            android:padding="5dp"
+            android:src="@drawable/rewind"
+
+           />
+
+        <ImageView
+            android:id="@+id/iv_pause"
+            android:layout_width="58dp"
+            android:layout_height="58dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="7dp"
+            android:padding="5dp"
+            android:src="@drawable/pause"
+
+
+
+            />
+
+        <ImageView
+            android:id="@+id/iv_play"
+            android:layout_width="58dp"
+            android:layout_height="58dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginRight="15dp"
+            android:padding="5dp"
+            android:src="@drawable/play"
+
+
+            />
+
+
+        <ImageView
+            android:id="@+id/iv_forward"
+            android:layout_width="58dp"
+            android:layout_height="58dp"
+            android:padding="5dp"
+
+            android:src="@drawable/forward"
+
+           />
+    </LinearLayout>
+
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_above="@+id/re"
+        android:layout_marginBottom="5dp" />
+
+    <TextView
+        android:id="@+id/tv_startTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/seekBar"
+        android:layout_marginLeft="20dp"
+        android:text="0 min, 0 sec"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/colorBlack"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_endTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/seekBar"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="20dp"
+        android:text="0 min, 0 sec"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/colorBlack"
+        android:textStyle="bold"
+
+        />
+
+
+
+</RelativeLayout>

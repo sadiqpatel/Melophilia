@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.melophilia.Admin.adminHome;
 import com.example.melophilia.R;
 import com.example.melophilia.User.userHome;
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,7 +26,7 @@ public class authenticationActivity extends AppCompatActivity implements View.On
 
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             if (FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()) {
-                startActivity(new Intent(authenticationActivity.this, userHome.class));
+                startActivity(new Intent(authenticationActivity.this, adminHome.class));
             }
         }
     }

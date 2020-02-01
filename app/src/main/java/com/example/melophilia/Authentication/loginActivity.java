@@ -73,7 +73,7 @@ public class loginActivity extends AppCompatActivity implements View.OnClickList
                                 startActivity(new Intent(loginActivity.this, adminHome.class));
                             } else if (mAuth.getCurrentUser().isEmailVerified()) {
                                 progressDialog.dismiss();
-                                startActivity(new Intent(loginActivity.this, userHome.class));
+                                startActivity(new Intent(loginActivity.this, adminHome.class));
                             } else {
                                 progressDialog.dismiss();
                                 Toast.makeText(loginActivity.this, "Please Verify your email", Toast.LENGTH_SHORT).show();
