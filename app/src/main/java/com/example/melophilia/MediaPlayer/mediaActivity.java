@@ -4,11 +4,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -20,9 +26,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.melophilia.Admin.adminHome;
+import com.example.melophilia.CreateNotification;
+import com.example.melophilia.MainActivity;
 import com.example.melophilia.R;
+import com.example.melophilia.Service.OnClearFromRecentService;
+import com.example.melophilia.Track;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class mediaActivity extends AppCompatActivity implements View.OnClickListener {
@@ -40,6 +52,13 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
     Uri uri;
     ProgressDialog progressDialog;
     Toolbar mActionBarToolbar;
+
+    NotificationManager notificationManager;
+    int position = 0;
+    boolean isPlaying = false;
+
+    List<Track> track;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +95,11 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
         seekbar.setClickable(false);
         iv_pause.setEnabled(false);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            createChannel();
+            registerReceiver(broadcastReceiver, new IntentFilter("TRACKS_TRACKS"));
+            startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
+        }
 
         uri = Uri.parse(myUri);
         mediaPlayer = new MediaPlayer();
@@ -97,6 +121,40 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
         });
     }
 
+    private void createChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID,
+                    "KOD Dev", NotificationManager.IMPORTANCE_LOW);
+
+            notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null){
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+    }
+
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getExtras().getString("actionname");
+
+            switch (action){
+                case CreateNotification.ACTION_PREVIUOS:
+                  //  onTrackPrevious();
+                    break;
+                case CreateNotification.ACTION_PLAY:
+                    if (isPlaying){
+                      //  onTrackPause();
+                    } else {
+                      //  onTrackPlay();
+                    }
+                    break;
+                case CreateNotification.ACTION_NEXT:
+                 //   onTrackNext();
+                    break;
+            }
+        }
+    };
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -117,7 +175,6 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
             iv_pause.setEnabled(false);
             iv_play.setEnabled(true);
         } else if (view == iv_play) {
-
 
             Toast.makeText(getApplicationContext(), "Playing sound", Toast.LENGTH_SHORT).show();
             mediaPlayer.start();
@@ -140,6 +197,14 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
                             TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long)
                                     startTime)))
             );
+
+            track = new ArrayList<>();
+
+            track.add(new Track("Track 1", "Artist 1", R.drawable.applogo));
+            CreateNotification.createNotification(mediaActivity.this, track.get(position),
+                    R.drawable.ic_pause_black_24dp, position, 4);
+
+            isPlaying = true;
 
             seekbar.setProgress((int) startTime);
             myHandler.postDelayed(UpdateSongTime, 100);
