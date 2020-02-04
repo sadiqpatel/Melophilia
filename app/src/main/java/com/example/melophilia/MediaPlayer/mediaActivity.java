@@ -27,17 +27,18 @@ import android.widget.Toast;
 
 import com.example.melophilia.Admin.adminHome;
 import com.example.melophilia.CreateNotification;
+import com.example.melophilia.CustomItemClickListener;
 import com.example.melophilia.MainActivity;
+import com.example.melophilia.Model.audioModel;
 import com.example.melophilia.R;
 import com.example.melophilia.Service.OnClearFromRecentService;
 import com.example.melophilia.Track;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class mediaActivity extends AppCompatActivity implements View.OnClickListener {
+public class mediaActivity extends AppCompatActivity implements View.OnClickListener, Playable {
     private ImageView iv_rewind, iv_pause, iv_play, iv_forward;
     private MediaPlayer mediaPlayer;
     private double startTime = 0;
@@ -57,19 +58,61 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
     int position = 0;
     boolean isPlaying = false;
 
-    List<Track> track;
-
+    List<audioModel> tracks;
+    String title, myUri, artist;
+    int image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_media);
+        progressDialog();
+
+        Intent intent = getIntent();
+        title = intent.getStringExtra("title");
+        myUri = intent.getStringExtra("uri");
+        artist = intent.getStringExtra("artist");
+        image = intent.getIntExtra("image", R.drawable.t2);
+        tracks = (List<audioModel>) intent.getSerializableExtra("audio");
+
+        init();
+        mediaPlayerInit();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            createChannel();
+            registerReceiver(broadcastReceiver, new IntentFilter("TRACKS_TRACKS"));
+            startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
+        }
+    }
+
+    private void progressDialog() {
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Loading");
         progressDialog.show();
-        Intent intent = getIntent();
-        String title = intent.getStringExtra("title");
-        String myUri = intent.getStringExtra("uri");
+    }
+
+    private void mediaPlayerInit() {
+        uri = Uri.parse(myUri);
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+        try {
+            mediaPlayer.setDataSource(getApplicationContext(), uri);
+            mediaPlayer.prepareAsync();
+        } catch (IOException e) {
+            Log.d("mediaActivity","ads"+e.getLocalizedMessage());
+            e.printStackTrace();
+        }
+
+        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mediaPlayer) {
+                progressDialog.dismiss();
+            }
+        });
+    }
+
+    private void init() {
         mActionBarToolbar = (Toolbar) findViewById(R.id.confirm_order_toolbar_layout);
         setSupportActionBar(mActionBarToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -90,35 +133,9 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
         tv_endTime = (TextView) findViewById(R.id.tv_endTime);
         tv_songName = (TextView) findViewById(R.id.tv_songName);
 
-
         seekbar = (SeekBar) findViewById(R.id.seekBar);
         seekbar.setClickable(false);
         iv_pause.setEnabled(false);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            createChannel();
-            registerReceiver(broadcastReceiver, new IntentFilter("TRACKS_TRACKS"));
-            startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
-        }
-
-        uri = Uri.parse(myUri);
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
-        try {
-            mediaPlayer.setDataSource(getApplicationContext(), uri);
-            mediaPlayer.prepareAsync();
-        } catch (IOException e) {
-            Log.d("mediaActivity","ads"+e.getLocalizedMessage());
-            e.printStackTrace();
-        }
-
-        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mediaPlayer) {
-                progressDialog.dismiss();
-            }
-        });
     }
 
     private void createChannel() {
@@ -140,17 +157,17 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
 
             switch (action){
                 case CreateNotification.ACTION_PREVIUOS:
-                  //  onTrackPrevious();
+                    onTrackPrevious();
                     break;
                 case CreateNotification.ACTION_PLAY:
                     if (isPlaying){
-                      //  onTrackPause();
+                        onTrackPause();
                     } else {
-                      //  onTrackPlay();
+                        onTrackPlay();
                     }
                     break;
                 case CreateNotification.ACTION_NEXT:
-                 //   onTrackNext();
+                    onTrackNext();
                     break;
             }
         }
@@ -176,6 +193,12 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
             iv_play.setEnabled(true);
         } else if (view == iv_play) {
 
+            if (isPlaying){
+                onTrackPause();
+            } else {
+                onTrackPlay();
+            }
+
             Toast.makeText(getApplicationContext(), "Playing sound", Toast.LENGTH_SHORT).show();
             mediaPlayer.start();
             finalTime = mediaPlayer.getDuration();
@@ -197,14 +220,6 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
                             TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long)
                                     startTime)))
             );
-
-            track = new ArrayList<>();
-
-            track.add(new Track("Track 1", "Artist 1", R.drawable.applogo));
-            CreateNotification.createNotification(mediaActivity.this, track.get(position),
-                    R.drawable.ic_pause_black_24dp, position, 4);
-
-            isPlaying = true;
 
             seekbar.setProgress((int) startTime);
             myHandler.postDelayed(UpdateSongTime, 100);
@@ -261,4 +276,58 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
         mediaPlayer.stop();
         finish();
     }
+
+    @Override
+    public void onTrackPrevious() {
+
+        position--;
+        CreateNotification.createNotification(mediaActivity.this, tracks.get(position),
+                R.drawable.ic_pause_black_24dp, position, tracks.size()-1);
+
+    }
+
+    @Override
+    public void onTrackPlay() {
+
+        CreateNotification.createNotification(mediaActivity.this, tracks.get(position),
+                R.drawable.ic_pause_black_24dp, position, tracks.size()-1);
+        isPlaying = true;
+
+    }
+
+    @Override
+    public void onTrackPause() {
+
+        CreateNotification.createNotification(mediaActivity.this, tracks.get(position),
+                R.drawable.ic_play_arrow_black_24dp, position, tracks.size()-1);
+        isPlaying = false;
+
+    }
+
+    @Override
+    public void onTrackNext() {
+
+        position++;
+        CreateNotification.createNotification(mediaActivity.this, tracks.get(position),
+                R.drawable.ic_pause_black_24dp, position, tracks.size()-1);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            notificationManager.cancelAll();
+        }
+
+        unregisterReceiver(broadcastReceiver);
+    }
+
+
+}
+interface Playable {
+    void onTrackPrevious();
+    void onTrackPlay();
+    void onTrackPause();
+    void onTrackNext();
 }

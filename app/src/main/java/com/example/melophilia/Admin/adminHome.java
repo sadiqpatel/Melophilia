@@ -110,6 +110,11 @@ public class adminHome extends AppCompatActivity {
                 confirmDeleteDialog(data,songId);
 
             }
+
+            @Override
+            public void onItemPlay(audioModel audioModel) {
+
+            }
         });
         rv_songList.setAdapter(adminSongAdapter);
 

@@ -1,9 +1,15 @@
 package com.example.melophilia.Model;
 
-public class audioModel {
+import java.io.Serializable;
+
+public class audioModel implements Serializable {
+
+    public audioModel(String songTitle, String songWriter, int image){
+        this.songTitle = songTitle;
+        this.songWriter = songWriter;
+    }
 
     public audioModel() {
-
     }
 
     public String getSongUri() {
@@ -41,4 +47,23 @@ public class audioModel {
     }
 
 
+    public void setSongUri(String songUri) {
+        this.songUri = songUri;
+    }
+
+    public void setSongTitle(String songTitle) {
+        this.songTitle = songTitle;
+    }
+
+    public void setSongWriter(String songWriter) {
+        this.songWriter = songWriter;
+    }
+
+    public void setSongId(String songId) {
+        this.songId = songId;
+    }
+
+    public void setSongKey(String songKey) {
+        this.songKey = songKey;
+    }
 }

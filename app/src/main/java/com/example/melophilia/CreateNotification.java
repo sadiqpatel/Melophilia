@@ -12,6 +12,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.example.melophilia.Model.audioModel;
 import com.example.melophilia.Service.NotificationActionService;
 
 public class CreateNotification {
@@ -24,14 +25,14 @@ public class CreateNotification {
 
     public static Notification notification;
 
-    public static void createNotification(Context context, Track track, int playbutton, int pos, int size){
+    public static void createNotification(Context context, audioModel track, int playbutton, int pos, int size){
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
 
             NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
             MediaSessionCompat mediaSessionCompat = new MediaSessionCompat( context, "tag");
 
-            Bitmap icon = BitmapFactory.decodeResource(context.getResources(), track.getImage());
+            Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.t1);
 
             PendingIntent pendingIntentPrevious;
             int drw_previous;
@@ -67,8 +68,8 @@ public class CreateNotification {
             //create notification
             notification = new NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_music_note)
-                    .setContentTitle(track.getTitle())
-                    .setContentText(track.getArtist())
+                    .setContentTitle(track.getSongTitle())
+                    .setContentText(track.getSongWriter())
                     .setLargeIcon(icon)
                     .setOnlyAlertOnce(true)//show notification for only first time
                     .setShowWhen(false)

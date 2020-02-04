@@ -21,6 +21,7 @@ import com.example.melophilia.Model.audioModel;
 import com.example.melophilia.R;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class adminSongAdapter extends RecyclerView.Adapter<adminSongAdapter.ViewHolder> {
@@ -60,9 +61,15 @@ public class adminSongAdapter extends RecyclerView.Adapter<adminSongAdapter.View
                 Intent intent = new Intent(context, mediaActivity.class);
                 intent.putExtra("uri",audioModels.get(position).getSongUri());
                 intent.putExtra("title",audioModels.get(position).getSongTitle());
+                intent.putExtra("artist",audioModels.get(position).getSongWriter());
+                intent.putExtra("image",R.drawable.t1);
+                intent.putExtra("audio", (Serializable) audioModels);
+
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                 context.startActivity(intent);
+
+                listener.onItemPlay(audioModels.get(position));
 
             }
         });
