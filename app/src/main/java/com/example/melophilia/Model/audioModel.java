@@ -1,6 +1,8 @@
 package com.example.melophilia.Model;
 
-public class audioModel {
+import java.io.Serializable;
+
+public class audioModel implements Serializable {
 
     public audioModel() {
 

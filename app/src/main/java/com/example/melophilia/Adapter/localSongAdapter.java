@@ -18,13 +18,15 @@ import com.example.melophilia.MediaPlayer.mediaActivity;
 import com.example.melophilia.Model.audioModel;
 import com.example.melophilia.R;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class localSongAdapter extends RecyclerView.Adapter<localSongAdapter.ViewHolder> {
     Context context;
-    List<audioModel> audioModels;
+    ArrayList<audioModel> audioModels;
 
-    public localSongAdapter(Context context, List<audioModel> audioModels) {
+    public localSongAdapter(Context context, ArrayList<audioModel> audioModels) {
         this.context = context;
         this.audioModels = audioModels;
     }
@@ -44,6 +46,7 @@ public class localSongAdapter extends RecyclerView.Adapter<localSongAdapter.View
             public void onClick(View view) {
                 Intent intent = new Intent(context, mediaActivity.class);
                 intent.putExtra("title", audioModels.get(position).getSongTitle());
+                intent.putExtra("audioModels", audioModels);
                 intent.putExtra("uri",audioModels.get(position).getSongUri());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);

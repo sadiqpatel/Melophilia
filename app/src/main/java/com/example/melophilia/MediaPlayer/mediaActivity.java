@@ -2,13 +2,22 @@ package com.example.melophilia.MediaPlayer;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationCompat;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -23,13 +32,18 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.melophilia.Admin.adminHome;
 import com.example.melophilia.Home.homeActivity;
+import com.example.melophilia.Interface.Playable;
+import com.example.melophilia.Model.audioModel;
 import com.example.melophilia.R;
+import com.example.melophilia.Service.OnClearFromRecentService;
 import com.example.melophilia.utils.noInternet;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class mediaActivity extends AppCompatActivity implements View.OnClickListener {
+public class mediaActivity extends AppCompatActivity implements View.OnClickListener, Playable {
     private ImageView iv_rewind, iv_pause, iv_play, iv_forward, iv_songImg;
     private MediaPlayer mediaPlayer;
     private double startTime = 0;
@@ -44,6 +58,11 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
     Uri uri;
     ProgressDialog progressDialog;
     Toolbar mActionBarToolbar;
+    NotificationManager notificationManager;
+    int position = 0;
+    boolean isPlaying = false;
+    List<audioModel> tracks;
+    private String title, myUri;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -54,10 +73,18 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
         progressDialog.setMessage("Loading");
         progressDialog.setCancelable(false);
         progressDialog.show();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            createChannel();
+            registerReceiver(broadcastReceiver, new IntentFilter("TRACKS_TRACKS"));
+            startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
+        }
+
         iv_songImg = findViewById(R.id.songImg);
         Intent intent = getIntent();
-        String title = intent.getStringExtra("title");
-        String myUri = intent.getStringExtra("uri");
+        title = intent.getStringExtra("title");
+        myUri = intent.getStringExtra("uri");
+        tracks = (List<audioModel>) intent.getSerializableExtra("audioModels");
         Log.d("mediaActivity","uri"+myUri);
         String songImg = intent.getStringExtra("imguri");
         Glide
@@ -147,40 +174,93 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
         });
     }
 
+    private void createChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID,
+                    "KOD Dev", NotificationManager.IMPORTANCE_LOW);
+
+            notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null){
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+    }
+
+
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getExtras().getString("actionname");
+
+            switch (action){
+                case CreateNotification.ACTION_PREVIUOS:
+                    onTrackPrevious();
+                    break;
+                case CreateNotification.ACTION_PLAY:
+                    if (isPlaying){
+                        onTrackPause();
+                    } else {
+                        onTrackPlay();
+                    }
+                    break;
+                case CreateNotification.ACTION_NEXT:
+                    onTrackNext();
+                    break;
+            }
+        }
+    };
+
 
     @SuppressLint("DefaultLocale")
     @Override
     public void onClick(View view) {
         if (view == iv_rewind) {
-            int temp = (int) startTime;
-
-            if ((temp - backwardTime) > 0) {
-                startTime = startTime - backwardTime;
-                mediaPlayer.seekTo((int) startTime);
-                Toast.makeText(getApplicationContext(), "You have rewind backward 5 seconds", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getApplicationContext(), "Cannot rewind backward 5 seconds", Toast.LENGTH_SHORT).show();
-            }
+            rewind();
         } else if (view == iv_pause) {
-            Toast.makeText(getApplicationContext(), "Pausing sound", Toast.LENGTH_SHORT).show();
-            mediaPlayer.pause();
-            iv_pause.setVisibility(View.GONE);
-            iv_play.setVisibility(View.VISIBLE);
-
+            pause();
         } else if (view == iv_play) {
-          play();
-        } else if (view == iv_forward) {
-            int temp = (int) startTime;
-
-            if ((temp + forwardTime) <= finalTime) {
-                startTime = startTime + forwardTime;
-                mediaPlayer.seekTo((int) startTime);
-                Toast.makeText(getApplicationContext(), "You have forwarded 5 seconds", Toast.LENGTH_SHORT).show();
+            if (isPlaying){
+                onTrackPause();
+                pause();
             } else {
-                Toast.makeText(getApplicationContext(), "Cannot forward 5 seconds", Toast.LENGTH_SHORT).show();
+                onTrackPlay();
+                play();
             }
+        } else if (view == iv_forward) {
+            forward();
         }
 
+    }
+
+    private void forward() {
+        int temp = (int) startTime;
+
+        if ((temp + forwardTime) <= finalTime) {
+            startTime = startTime + forwardTime;
+            mediaPlayer.seekTo((int) startTime);
+            Toast.makeText(getApplicationContext(), "You have forwarded 5 seconds", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Cannot forward 5 seconds", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void pause() {
+        Toast.makeText(getApplicationContext(), "Pausing sound", Toast.LENGTH_SHORT).show();
+        mediaPlayer.pause();
+        iv_pause.setVisibility(View.GONE);
+        iv_play.setVisibility(View.VISIBLE);
+    }
+
+    private void rewind() {
+        int temp = (int) startTime;
+
+        if ((temp - backwardTime) > 0) {
+            startTime = startTime - backwardTime;
+            mediaPlayer.seekTo((int) startTime);
+            Toast.makeText(getApplicationContext(), "You have rewind backward 5 seconds", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Cannot rewind backward 5 seconds", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -263,4 +343,72 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
            }
         }
     }
+
+    @Override
+    public void onTrackPrevious() {
+        position--;
+        CreateNotification.createNotification(mediaActivity.this, title, title,
+                R.drawable.pause, position, tracks.size()-1);
+        rewind();
+    }
+
+    @Override
+    public void onTrackPlay() {
+
+        CreateNotification.createNotification(mediaActivity.this, title, title,
+                R.drawable.pause, position, tracks.size()-1);
+        isPlaying = true;
+        play();
+
+    }
+
+    @Override
+    public void onTrackPause() {
+
+        CreateNotification.createNotification(mediaActivity.this, title, title,
+                R.drawable.play, position, tracks.size()-1);
+        isPlaying = false;
+        pause();
+    }
+
+    @Override
+    public void onTrackNext() {
+
+        position++;
+        CreateNotification.createNotification(mediaActivity.this, title, title,
+                R.drawable.pause, position, tracks.size()-1);
+        forward();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            notificationManager.cancelAll();
+        }
+
+        unregisterReceiver(broadcastReceiver);
+    }
 }
+
+/*class NotificationGenerator{
+
+    public static final int NOTIFICATION_ID_OPEN_ACTIVITY = 9;
+
+    public static void openActivityNotification(Context context){
+        @SuppressWarnings("deprecation")
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Intent notifyIntent = new Intent(context, mediaActivity.class);
+        notifyIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notifyIntent, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+    }
+
+    public static void customNotification(Context context){
+       // NotificationManager manager = context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+    }
+}*/

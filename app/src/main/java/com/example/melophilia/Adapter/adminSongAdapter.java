@@ -74,6 +74,7 @@ public class adminSongAdapter extends RecyclerView.Adapter<adminSongAdapter.View
 
                     Intent intent = new Intent(context, mediaActivity.class);
                     intent.putExtra("uri", audioModels.get(position).getSongUri());
+                    intent.putExtra("audiModels", audioModels);
                     intent.putExtra("title", audioModels.get(position).getSongTitle());
                     intent.putExtra("imguri", audioModels.get(position).getSongImg());
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

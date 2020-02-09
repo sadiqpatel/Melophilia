@@ -24,7 +24,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".Authentication.authenticationActivity" />
-        <activity android:name=".User.userHome" />
+       <!--<activity android:name=".User.userHome" /> -->
         <activity
             android:name=".Authentication.forgotPasswordActivity"
             android:parentActivityName=".Authentication.loginActivity" />
@@ -32,6 +32,9 @@
         <activity android:name=".Authentication.loginActivity" />
         <activity android:name=".Authentication.registerActivity" />
         <activity android:name=".MainActivity" />
+
+        <receiver android:name=".Service.NotificationActionService"/>
+        <service android:name=".Service.OnClearFromRecentService"/>
     </application>
 
 </manifest>
