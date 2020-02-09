@@ -10,15 +10,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.melophilia.CustomItemClickListener;
 import com.example.melophilia.MediaPlayer.mediaActivity;
 import com.example.melophilia.Model.audioModel;
 import com.example.melophilia.R;
+import com.example.melophilia.utils.noInternet;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
@@ -27,11 +30,12 @@ public class adminSongAdapter extends RecyclerView.Adapter<adminSongAdapter.View
     public Context context;
     public ArrayList<audioModel> audioModels;
     CustomItemClickListener listener;
-    public adminSongAdapter(Context context, ArrayList<audioModel> audioModels,  CustomItemClickListener listener) {
+
+    public adminSongAdapter(Context context, ArrayList<audioModel> audioModels, CustomItemClickListener listener) {
         this.context = context;
         this.audioModels = audioModels;
         this.listener = listener;
-        Log.d("adminhome123","cons");
+        Log.d("adminhome123", "cons");
 
 
     }
@@ -45,6 +49,12 @@ public class adminSongAdapter extends RecyclerView.Adapter<adminSongAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
+        Glide
+                .with(context)
+                .load(audioModels.get(position).getSongImg())
+                .centerCrop()
+                .placeholder(R.drawable.demo)
+                .into(holder.iv_songImage);
         holder.tv_songTitle.setText(audioModels.get(position).songTitle);
         holder.tv_songWriter.setText(audioModels.get(position).songWriter);
         holder.iv_delete.setOnClickListener(new View.OnClickListener() {
@@ -57,27 +67,32 @@ public class adminSongAdapter extends RecyclerView.Adapter<adminSongAdapter.View
         holder.rl_song.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context, mediaActivity.class);
-                intent.putExtra("uri",audioModels.get(position).getSongUri());
-                intent.putExtra("title",audioModels.get(position).getSongTitle());
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                if (!(noInternet.isInternetAvailable(context))) //returns true if internet available
+                {
+                    Toast.makeText(context, "Check your internet Connection", Toast.LENGTH_SHORT).show();
+                } else {
 
-                context.startActivity(intent);
-
+                    Intent intent = new Intent(context, mediaActivity.class);
+                    intent.putExtra("uri", audioModels.get(position).getSongUri());
+                    intent.putExtra("title", audioModels.get(position).getSongTitle());
+                    intent.putExtra("imguri", audioModels.get(position).getSongImg());
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(intent);
+                }
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        Log.d("adminhome123","count"+audioModels.size());
+        Log.d("adminhome123", "count" + audioModels.size());
         return audioModels.size();
 
     }
 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView iv_songImage, iv_delete,iv_arrow;
+        ImageView iv_songImage, iv_delete, iv_arrow;
         TextView tv_songTitle, tv_songWriter;
         FirebaseAuth mAuth;
         RelativeLayout rl_song;
@@ -91,7 +106,7 @@ public class adminSongAdapter extends RecyclerView.Adapter<adminSongAdapter.View
             tv_songWriter = itemView.findViewById(R.id.tv_songWriter);
             iv_delete = itemView.findViewById(R.id.iv_delete);
             iv_arrow = itemView.findViewById(R.id.iv_arrow);
-            if(!(mAuth.getCurrentUser().getEmail().equals("admin12345@gmail.com"))){
+            if (!(mAuth.getCurrentUser().getEmail().equals("admin12345@gmail.com"))) {
                 iv_delete.setVisibility(View.INVISIBLE);
             }
         }

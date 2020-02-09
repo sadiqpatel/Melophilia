@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.melophilia.R;
+import com.example.melophilia.utils.noInternet;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -36,6 +37,8 @@ public class registerActivity extends AppCompatActivity implements View.OnClickL
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Registering User...");
+        progressDialog.setCancelable(false);
+
         mAuth = FirebaseAuth.getInstance();
         bt_signUp = findViewById(R.id.bt_register);
         et_registerEmail = findViewById(R.id.et_registerEmail);
@@ -112,8 +115,15 @@ public class registerActivity extends AppCompatActivity implements View.OnClickL
         } else if (userpassword.length() <= 5) {
             Toast.makeText(this, "Password should have atleast 6 characters", Toast.LENGTH_SHORT).show();
         } else {
-            progressDialog.show();
-            createUser(useremailid, userpassword);
+            if (!(noInternet.isInternetAvailable(getApplicationContext()))) //returns true if internet available
+            {
+                Toast.makeText(getApplicationContext(), "Check your internet Connection", Toast.LENGTH_SHORT).show();
+            } else {
+                progressDialog.show();
+                createUser(useremailid, userpassword);
+            }
+
+
         }
     }
 }

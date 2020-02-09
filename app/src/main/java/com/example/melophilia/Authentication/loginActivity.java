@@ -2,9 +2,13 @@ package com.example.melophilia.Authentication;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -17,8 +21,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.melophilia.Admin.adminHome;
+import com.example.melophilia.Home.homeActivity;
 import com.example.melophilia.R;
-import com.example.melophilia.User.userHome;
+import com.example.melophilia.utils.noInternet;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -31,6 +36,8 @@ public class loginActivity extends AppCompatActivity implements View.OnClickList
     EditText et_loginEmail, et_loginPassword;
     Button bt_signIn;
     TextView tv_signUp, tv_forgotPassword;
+    private static final int MY_PERMISSIONS_REQUEST_READ = 1;
+
 
     @Override
     public void onBackPressed() {
@@ -47,6 +54,8 @@ public class loginActivity extends AppCompatActivity implements View.OnClickList
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Authenticating");
+        progressDialog.setCancelable(false);
+
         mAuth = FirebaseAuth.getInstance();
         et_loginEmail = findViewById(R.id.et_loginEmail);
         et_loginPassword = findViewById(R.id.et_loginPassword);
@@ -57,7 +66,7 @@ public class loginActivity extends AppCompatActivity implements View.OnClickList
         tv_forgotPassword.setOnClickListener(this);
         tv_signUp.setOnClickListener(this);
 
-
+        choosePermission();
 
     }
 
@@ -70,10 +79,10 @@ public class loginActivity extends AppCompatActivity implements View.OnClickList
                             Log.d("login1234", "email" + email);
                             if (email.equals("admin12345@gmail.com")) {
                                 progressDialog.dismiss();
-                                startActivity(new Intent(loginActivity.this, adminHome.class));
+                                startActivity(new Intent(loginActivity.this, homeActivity.class));
                             } else if (mAuth.getCurrentUser().isEmailVerified()) {
                                 progressDialog.dismiss();
-                                startActivity(new Intent(loginActivity.this, adminHome.class));
+                                startActivity(new Intent(loginActivity.this, homeActivity.class));
                             } else {
                                 progressDialog.dismiss();
                                 Toast.makeText(loginActivity.this, "Please Verify your email", Toast.LENGTH_SHORT).show();
@@ -116,6 +125,32 @@ public class loginActivity extends AppCompatActivity implements View.OnClickList
             startActivity(new Intent(loginActivity.this, registerActivity.class));
         }
     }
+    public void choosePermission() {
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Permission is not granted
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(loginActivity.this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                Toast.makeText(getApplicationContext(), "Go to settings and give storage permission to the app", Toast.LENGTH_LONG).show();
+
+            } else {
+                // No explanation needed; request the permission
+                ActivityCompat.requestPermissions(loginActivity.this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        MY_PERMISSIONS_REQUEST_READ);
+
+                // MY_PERMISSIONS_REQUEST_READ is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        }
+    }
 
 
     public void validate() {
@@ -128,9 +163,16 @@ public class loginActivity extends AppCompatActivity implements View.OnClickList
         } else if (!useremailid.matches(getResources().getString(R.string.emailPattern))) {
             Toast.makeText(this, "Enter proper EmailAddress", Toast.LENGTH_SHORT).show();
         } else {
-            progressDialog.show();
-            signin(useremailid, userpassword);
+            if (!(noInternet.isInternetAvailable(getApplicationContext()))) //returns true if internet available
+            {
+                Toast.makeText(getApplicationContext(), "Check your internet Connection", Toast.LENGTH_SHORT).show();
+            } else {
+                progressDialog.show();
+                signin(useremailid, userpassword);
+            }
+
         }
     }
+
 
 }

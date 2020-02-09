@@ -21,7 +21,6 @@
     <string name="user"><u>Home</u></string>
 
 
-
     <!-- Validations -->
     <string name="empty_email">Enter Email Address</string>
     <string name="empty_password">Enter Password</string>
@@ -32,6 +31,9 @@
     <string name="cancel">Cancel</string>
 
     <string name="choose_song">Choose Song</string>
+    <string name="choose_image">Choose Image</string>
+    <string name="search">Search</string>
+
     <string name="add_song">Add Music</string>
     <string name="song_writer">Song Writer</string>
     <string name="song_title">Song Title</string>
