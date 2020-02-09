@@ -55,7 +55,7 @@ public class CreateNotification {
 
             PendingIntent pendingIntentNext;
             int drw_next;
-            if (pos == size){
+            /*if (pos == size){
                 pendingIntentNext = null;
                 drw_next = 0;
             } else {
@@ -64,7 +64,7 @@ public class CreateNotification {
                 pendingIntentNext = PendingIntent.getBroadcast(context, 0,
                         intentNext, PendingIntent.FLAG_UPDATE_CURRENT);
                 drw_next = R.drawable.forward;
-            }
+            }*/
 
             //create notification
             notification = new NotificationCompat.Builder(context, CHANNEL_ID)
@@ -76,7 +76,7 @@ public class CreateNotification {
                     .setShowWhen(false)
                     .addAction(drw_previous, "Previous", pendingIntentPrevious)
                     .addAction(playbutton, "Play", pendingIntentPlay)
-                    .addAction(drw_next, "Next", pendingIntentNext)
+                    //.addAction(drw_next, "Next", pendingIntentNext)
                     .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                         .setShowActionsInCompactView(0, 1, 2)
                         .setMediaSession(mediaSessionCompat.getSessionToken()))
