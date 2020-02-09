@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.melophilia.R;
+import com.example.melophilia.utils.noInternet;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,6 +33,8 @@ public class forgotPasswordActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Sending Mail");
+        progressDialog.setCancelable(false);
+
         bt_sendMail = findViewById(R.id.bt_sendMail);
         et_email = findViewById(R.id.et_forgotEmail);
 
@@ -76,8 +79,15 @@ public class forgotPasswordActivity extends AppCompatActivity {
         } else if (!useremailid.matches(getResources().getString(R.string.emailPattern))) {
             Toast.makeText(this, "Enter proper EmailAddress", Toast.LENGTH_SHORT).show();
         } else {
-            progressDialog.show();
-            forgotPassword(useremailid);
+            if (!(noInternet.isInternetAvailable(getApplicationContext()))) //returns true if internet available
+            {
+                Toast.makeText(getApplicationContext(), "Check your internet Connection", Toast.LENGTH_SHORT).show();
+            } else {
+                progressDialog.show();
+                forgotPassword(useremailid);
+            }
+
+
         }
     }
 

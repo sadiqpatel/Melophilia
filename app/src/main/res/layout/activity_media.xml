@@ -14,13 +14,17 @@
         app:titleTextColor="@color/colorWhite" />
 
     <ImageView
+        android:layout_below="@+id/confirm_order_toolbar_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/songImg"
         android:src="@drawable/applogo"
+        android:layout_above="@+id/tv_endTime"
+        android:scaleType="fitXY"
 
         />
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/re"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,7 +32,7 @@
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_marginBottom="10dp"
-        android:gravity="center">
+     >
 
         <ImageView
             android:id="@+id/iv_rewind"
@@ -36,7 +40,8 @@
             android:layout_height="58dp"
             android:padding="5dp"
             android:src="@drawable/rewind"
-
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="50dp"
            />
 
         <ImageView
@@ -47,9 +52,7 @@
             android:layout_marginRight="7dp"
             android:padding="5dp"
             android:src="@drawable/pause"
-
-
-
+            android:layout_centerHorizontal="true"
             />
 
         <ImageView
@@ -59,7 +62,11 @@
             android:layout_marginLeft="7dp"
             android:layout_marginRight="15dp"
             android:padding="5dp"
+            android:visibility="gone"
             android:src="@drawable/play"
+            android:layout_centerHorizontal="true"
+
+
 
 
             />
@@ -70,11 +77,12 @@
             android:layout_width="58dp"
             android:layout_height="58dp"
             android:padding="5dp"
-
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="50dp"
             android:src="@drawable/forward"
 
            />
-    </LinearLayout>
+    </RelativeLayout>
 
     <SeekBar
         android:id="@+id/seekBar"

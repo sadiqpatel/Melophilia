@@ -8,15 +8,7 @@
     android:orientation="vertical"
     >
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/confirm_order_toolbar_layout"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:theme="@style/ToolbarTheme"
-        app:titleTextAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:titleTextColor="@color/colorWhite"
-        android:background="@color/colorApp"
-        />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floating_action_button"
         android:layout_width="wrap_content"

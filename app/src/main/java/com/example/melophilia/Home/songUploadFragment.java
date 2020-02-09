@@ -1,43 +1,45 @@
-package com.example.melophilia.Admin;
+package com.example.melophilia.Home;
+
+
+import android.app.ProgressDialog;
+import android.app.SearchManager;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuItemCompat;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.Manifest;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.example.melophilia.Adapter.adminSongAdapter;
-import com.example.melophilia.Authentication.loginActivity;
+import com.example.melophilia.Admin.adminHome;
 import com.example.melophilia.CustomItemClickListener;
-import com.example.melophilia.R;
 import com.example.melophilia.Model.audioModel;
+import com.example.melophilia.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -49,17 +51,20 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
-public class adminHome extends AppCompatActivity {
+import static android.app.Activity.RESULT_OK;
+
+public class songUploadFragment extends Fragment {
+
     private final static String TAG = adminHome.class.getName();
     //All variables and object declarations here.
-    public static final int PICK_CHOOSE_RESULT = 1;
+    public static final int PICK_SONG_RESULT = 1;
+    public static final int PICK_IMAGE_RESULT = 2;
     private static final int MY_PERMISSIONS_REQUEST_READ = 1;
     Toolbar mActionBarToolbar;
-    Uri filePath;
+    Uri filePath, imagePath = null;
     ProgressDialog progressDialog;
     private DatabaseReference mDatabase;
     FloatingActionButton floatingActionButton;
@@ -67,53 +72,58 @@ public class adminHome extends AppCompatActivity {
     TextView tv_songName, tv_song;
     public ArrayList<audioModel> audioModels = new ArrayList<>();
     public RecyclerView rv_songList;
-    public adminSongAdapter adminSongAdapter;
+    public com.example.melophilia.Adapter.adminSongAdapter adminSongAdapter;
     FirebaseAuth mAuth;
+    ImageView iv_songImg;
+    String songKey, ImageKey;
+    String AudioURL, ImgURL = "";
 
-    String songKey;
+    public songUploadFragment() {
+        // Required empty public constructor
+    }
+
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_song_upload, container, false);
         mAuth = FirebaseAuth.getInstance();
         //Adding firebase reference.
         mDatabase = FirebaseDatabase.getInstance().getReference("Audio");
 
-        //Adding Toolbar
-        mActionBarToolbar = (Toolbar) findViewById(R.id.confirm_order_toolbar_layout);
-        setSupportActionBar(mActionBarToolbar);
-        getSupportActionBar().setTitle(getResources().getString(R.string.admin));
 
         //Adding progressDialog & linking other components with there xml id using findviewbyid.
-        progressDialog = new ProgressDialog(this);
+        progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage("Loading Songs");
-        floatingActionButton = findViewById(R.id.floating_action_button);
-        tv_song = findViewById(R.id.tv_songs);
-        rv_songList = findViewById(R.id.rv_songList);
+        progressDialog.setCancelable(false);
+
+        floatingActionButton = view.findViewById(R.id.floating_action_button);
+        tv_song = view.findViewById(R.id.tv_songs);
+        rv_songList = view.findViewById(R.id.rv_songList);
+
         if (!(mAuth.getCurrentUser().getEmail().equals("admin12345@gmail.com"))) {
             floatingActionButton.setVisibility(View.GONE);
-            tv_song.setText("Songs Playlist");
-            getSupportActionBar().setTitle(getResources().getString(R.string.user));
+
         }
         //Adding recyclerview and connecting it to a layout manager.
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         rv_songList.setLayoutManager(layoutManager);
 
         //Passing data to localSongAdapter constructor and setting the localSongAdapter.
-        adminSongAdapter = new adminSongAdapter(getApplicationContext(), audioModels, new CustomItemClickListener() {
+        adminSongAdapter = new adminSongAdapter(getContext(), audioModels, new CustomItemClickListener() {
             @Override
             public void onItemClick(View v, int position) {
 
                 String data = audioModels.get(position).getSongKey();
                 String songId = audioModels.get(position).getSongId();
-                confirmDeleteDialog(data,songId);
+                confirmDeleteDialog(data, songId);
 
             }
 
             @Override
             public void onItemPlay(audioModel audioModel) {
-
+                
             }
         });
         rv_songList.setAdapter(adminSongAdapter);
@@ -128,57 +138,8 @@ public class adminHome extends AppCompatActivity {
                 openDialog();
             }
         });
-    }
 
-  /*  private void getFilePath(String data) {
-        String fileName="";
-        for(int i = data.length()-1 ;i>=0;i--){
-            if(data.charAt(i) == '/'){
-                break  ;
-            }
-            else{
-                fileName = data.charAt(i)+fileName;
-            }
-        }
-        Toast.makeText(this, fileName, Toast.LENGTH_SHORT).show();
-        delete_storage(fileName);
-
-    }*/
-
-
-    //Adding menu to the toolbar with log out option.
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.home_menu, menu);
-        return true;
-    }
-
-    //Handling menu item click event in this method.
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.item_logout:
-                FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(adminHome.this, loginActivity.class));
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    //Handling the click of mobile backbutton.
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//***Change Here***
-        startActivity(intent);
-        finish();
-        System.exit(0);
-
+        return view;
     }
 
     //Method created
@@ -208,56 +169,38 @@ public class adminHome extends AppCompatActivity {
         });
     }
 
-    public void chooseFile() {
+    public void chooseSong() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("audio/*");
-        startActivityForResult(intent, PICK_CHOOSE_RESULT);
+        startActivityForResult(intent, PICK_SONG_RESULT);
     }
 
-    public void choosePermission() {
-        // Here, thisActivity is the current activity
-        if (ContextCompat.checkSelfPermission(adminHome.this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            // Permission is not granted
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(adminHome.this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-            } else {
-                // No explanation needed; request the permission
-                ActivityCompat.requestPermissions(adminHome.this,
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        MY_PERMISSIONS_REQUEST_READ);
-
-                // MY_PERMISSIONS_REQUEST_READ is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-            }
-        } else {
-            // Permission has already been granted
-            chooseFile();
-
-        }
+    public void chooseImage() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResult(intent, PICK_IMAGE_RESULT);
     }
+
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_CHOOSE_RESULT && resultCode == RESULT_OK && data != null) {
+        if (requestCode == PICK_SONG_RESULT && resultCode == RESULT_OK && data != null) {
             filePath = data.getData();
             getFileName(filePath);
             tvSongName = getFileName(filePath);
             tv_songName.setText(tvSongName);
+        }
+        if (requestCode == PICK_IMAGE_RESULT && resultCode == RESULT_OK && data != null) {
+            imagePath = data.getData();
+            iv_songImg.setImageURI(imagePath);
         }
     }
 
     public String getFileName(Uri uri) {
         String result = null;
         if (uri.getScheme().equals("content")) {
-            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            Cursor cursor = getActivity().getContentResolver().query(uri, null, null, null, null);
             try {
                 if (cursor != null && cursor.moveToFirst()) {
                     result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
@@ -287,7 +230,7 @@ public class adminHome extends AppCompatActivity {
             @Override
             public void onSuccess(Void aVoid) {
                 // File deleted successfully
-                Toast.makeText(adminHome.this, "Deleted Successfully", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Deleted Successfully", Toast.LENGTH_SHORT).show();
                 deleteDataRealtimeDatabase(songId);
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -295,7 +238,7 @@ public class adminHome extends AppCompatActivity {
             public void onFailure(@NonNull Exception exception) {
                 // Uh-oh, an error occurred!
                 Log.d("onFailure", "delete" + exception.getLocalizedMessage());
-                Toast.makeText(adminHome.this, exception.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), exception.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -306,10 +249,12 @@ public class adminHome extends AppCompatActivity {
         mDatabase.child(songId).removeValue();
     }
 
-    public void uploadFile_storage(final String songTitle, final String songWriter) {
+    public void uploadSong_storage(final String songTitle, final String songWriter) {
         Log.d(TAG, "uploadFile Storage");
         Log.d(TAG, songTitle);
         Log.d(TAG, songWriter);
+        AudioURL = null;
+        ImgURL = null;
         progressDialog.setMessage("Uploading file");
 
         progressDialog.show();
@@ -317,65 +262,114 @@ public class adminHome extends AppCompatActivity {
 
         songKey = mDatabase.push().getKey();
         final StorageReference audioRef = storageRef.child(songKey);
-        audioRef.putFile(filePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                //Song uploaded Successfully;
 
-                pushToDatabase(audioRef, songTitle, songWriter);
-            }
-        })
-                .addOnFailureListener(new OnFailureListener() {
+        Task upload_audio = audioRef.putFile(filePath);
+
+        final StorageReference ImgRef = FirebaseStorage.getInstance().getReference("Image");
+
+        Task upload_img = null;
+
+        if (imagePath != null) {
+            upload_img = ImgRef.putFile(imagePath);
+        }
+
+        Task all;
+        if (imagePath != null)
+            all = Tasks.whenAll(upload_audio, upload_img);
+        else
+            all = Tasks.whenAll(upload_audio);
+
+
+        all.addOnSuccessListener(new OnSuccessListener() {
+            @Override
+            public void onSuccess(Object o) {
+
+
+                Task<Uri> audio_uri = audioRef.getDownloadUrl();
+
+
+                audio_uri.addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d("adminhome123", "adminhome123" + e.getLocalizedMessage());
+                    public void onSuccess(Uri uri) {
+
+                        AudioURL = uri.toString();
+                        Log.e("AAURIAD = ", "URI =" + AudioURL);
+
                     }
                 });
+
+                Task<Uri> img_uri = null;
+                if (imagePath != null) {
+                    img_uri = ImgRef.getDownloadUrl();
+
+                    img_uri.addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            ImgURL = uri.toString();
+                            Log.e("AAURIIM = ", "URI =" + ImgURL);
+                        }
+                    });
+                }
+                Task all_uris;
+                if (imagePath != null)
+                    all_uris = Tasks.whenAll(audio_uri, img_uri);
+                else
+                    all_uris = Tasks.whenAll(audio_uri);
+
+                Tasks.whenAll(all_uris).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+//                        Log.e("AAURI = ", "URI =" + AudioURL);
+//                        Log.e("AAURI = ", "URI =" + ImgURL);
+
+                        upload(ImgURL, AudioURL, songTitle, songWriter, songKey);
+                    }
+                });
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                e.printStackTrace();
+            }
+        });
 
 
     }
 
-    private void pushToDatabase(StorageReference ref, final String songTitle, final String songWriter) {
-        ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                Log.d("music", "song" + uri);
-                String AudioURL = uri.toString();
-                uploadFile_rd(AudioURL, songTitle, songWriter, songKey);
-                progressDialog.dismiss();
-                Toast.makeText(adminHome.this, "File Uploaded Successfully", Toast.LENGTH_SHORT).show();
 
-            }
-        })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d("adminhome123", "adminhome123" + e.getLocalizedMessage());
 
-                    }
-                });
+
+    public void upload(String imgURL, String audioUrl, String songTitle, String songWriter, String songKey) {
+        uploadFile_rd(audioUrl, imgURL, songTitle, songWriter, songKey);
+        progressDialog.dismiss();
+        Toast.makeText(getContext(), "File Uploaded Successfully", Toast.LENGTH_SHORT).show();
     }
 
-
-    private void uploadFile_rd(String audioURL, String songTitle, String songWriter, String songKey) {
-String img ="";
+    private void uploadFile_rd(String audioURL, String imgRef, String songTitle, String songWriter, String songKey) {
         String mSongId = mDatabase.push().getKey();
-        audioModel audio = new audioModel(audioURL,img, songTitle, songWriter, mSongId, songKey);
+        audioModel audio = new audioModel(audioURL, imgRef, songTitle, songWriter, mSongId, songKey);
         mDatabase.child(mSongId).setValue(audio);
     }
 
     public void openDialog() {
-        final View dialogView = LayoutInflater.from(this).inflate(R.layout.fragment_dialog_add_songs, null);
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_dialog_add_songs, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(dialogView);
 
         final EditText et_writerName, et_songTitle;
-
+        Button bt_chooseImg = dialogView.findViewById(R.id.bt_chooseImg);
+        bt_chooseImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chooseImage();
+            }
+        });
         Button bt_chooseSong = dialogView.findViewById(R.id.bt_chooseSong);
         bt_chooseSong.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                choosePermission();
+                chooseSong();
             }
         });
         tv_songName = dialogView.findViewById(R.id.tv_songName);
@@ -384,7 +378,7 @@ String img ="";
         bt_upload = dialogView.findViewById(R.id.bt_upload);
         et_writerName = dialogView.findViewById(R.id.et_songWriter);
         et_songTitle = dialogView.findViewById(R.id.et_song_Title);
-
+        iv_songImg = dialogView.findViewById(R.id.iv_songImg);
 
         //finally creating the alert dialog and displaying it
         final AlertDialog alertDialog = builder.create();
@@ -402,9 +396,9 @@ String img ="";
                 } else if (songTitle.isEmpty()) {
                     et_songTitle.setError(getResources().getString(R.string.empty_password));
                 } else if (songName.isEmpty()) {
-                    Toast.makeText(adminHome.this, "Choose Song", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Choose Song", Toast.LENGTH_SHORT).show();
                 } else {
-                    uploadFile_storage(songTitle, songWriter);
+                    uploadSong_storage(songTitle, songWriter);
                     alertDialog.dismiss();
                 }
             }
@@ -417,9 +411,9 @@ String img ="";
         });
     }
 
-    public void confirmDeleteDialog(final String data,final String songId) {
+    public void confirmDeleteDialog(final String data, final String songId) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Are you sure you want to delete this song");
         builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
             @Override
@@ -439,4 +433,5 @@ String img ="";
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
+
 }

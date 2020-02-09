@@ -19,27 +19,31 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.melophilia.Admin.adminHome;
 import com.example.melophilia.CreateNotification;
 import com.example.melophilia.CustomItemClickListener;
+import com.example.melophilia.Home.homeActivity;
 import com.example.melophilia.MainActivity;
 import com.example.melophilia.Model.audioModel;
 import com.example.melophilia.R;
 import com.example.melophilia.Service.OnClearFromRecentService;
 import com.example.melophilia.Track;
+import com.example.melophilia.utils.noInternet;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class mediaActivity extends AppCompatActivity implements View.OnClickListener, Playable {
-    private ImageView iv_rewind, iv_pause, iv_play, iv_forward;
+    private ImageView iv_rewind, iv_pause, iv_play, iv_forward,iv_songImg;
     private MediaPlayer mediaPlayer;
     private double startTime = 0;
     private double finalTime = 0;
@@ -72,10 +76,18 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
         title = intent.getStringExtra("title");
         myUri = intent.getStringExtra("uri");
         artist = intent.getStringExtra("artist");
+        String songImg = intent.getStringExtra("imguri");
+
         image = intent.getIntExtra("image", R.drawable.t2);
         tracks = (List<audioModel>) intent.getSerializableExtra("audio");
 
         init();
+        Glide
+                .with(getApplicationContext())
+                .load(songImg)
+                .centerCrop()
+                .placeholder(R.drawable.demo)
+                .into(iv_songImg);
         mediaPlayerInit();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
@@ -89,6 +101,8 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Loading");
         progressDialog.show();
+        progressDialog.setCancelable(false);
+
     }
 
     private void mediaPlayerInit() {
@@ -108,6 +122,42 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
                 progressDialog.dismiss();
+                play();
+
+            }
+        });
+        seekbar.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                    Log.d("mediaActivity", "Moved , process data, Moved to :" + seekbar.getProgress());
+                    seekbar.setProgress(seekbar.getProgress());
+                    mediaPlayer.seekTo(seekbar.getProgress());
+                    return false;
+                }
+                Log.d("mediaActivity", "Touched , Progress :" + seekbar.getProgress());
+                return true;
+            }
+        });
+
+        seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                if(seekbar.getProgress() == finalTime){
+                    iv_play.setVisibility(View.VISIBLE);
+                    iv_pause.setVisibility(View.GONE);
+                    seekBar.setProgress(0);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
             }
         });
     }
@@ -123,6 +173,7 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
         iv_pause = findViewById(R.id.iv_pause);
         iv_play = findViewById(R.id.iv_play);
         iv_forward = findViewById(R.id.iv_forward);
+        iv_songImg = findViewById(R.id.songImg);
 
         iv_rewind.setOnClickListener(this);
         iv_pause.setOnClickListener(this);
@@ -135,7 +186,7 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
 
         seekbar = (SeekBar) findViewById(R.id.seekBar);
         seekbar.setClickable(false);
-        iv_pause.setEnabled(false);
+
     }
 
     private void createChannel() {
@@ -189,8 +240,8 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
         } else if (view == iv_pause) {
             Toast.makeText(getApplicationContext(), "Pausing sound", Toast.LENGTH_SHORT).show();
             mediaPlayer.pause();
-            iv_pause.setEnabled(false);
-            iv_play.setEnabled(true);
+            iv_pause.setVisibility(View.GONE);
+            iv_play.setVisibility(View.VISIBLE);
         } else if (view == iv_play) {
 
             if (isPlaying){
@@ -199,32 +250,7 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
                 onTrackPlay();
             }
 
-            Toast.makeText(getApplicationContext(), "Playing sound", Toast.LENGTH_SHORT).show();
-            mediaPlayer.start();
-            finalTime = mediaPlayer.getDuration();
-            startTime = mediaPlayer.getCurrentPosition();
-            if (oneTimeOnly == 0) {
-                seekbar.setMax((int) finalTime);
-                oneTimeOnly = 1;
-            }
-            tv_endTime.setText(String.format("%d min, %d sec",
-                    TimeUnit.MILLISECONDS.toMinutes((long) finalTime),
-                    TimeUnit.MILLISECONDS.toSeconds((long) finalTime) -
-                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long)
-                                    finalTime)))
-            );
-
-            tv_startTime.setText(String.format("%d min, %d sec",
-                    TimeUnit.MILLISECONDS.toMinutes((long) startTime),
-                    TimeUnit.MILLISECONDS.toSeconds((long) startTime) -
-                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long)
-                                    startTime)))
-            );
-
-            seekbar.setProgress((int) startTime);
-            myHandler.postDelayed(UpdateSongTime, 100);
-            iv_pause.setEnabled(true);
-            iv_play.setEnabled(false);
+            play();
         } else if (view == iv_forward) {
             int temp = (int) startTime;
 
@@ -244,7 +270,7 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
             case android.R.id.home:
                 // todo: goto back activity from here
 
-                Intent intent = new Intent(mediaActivity.this, adminHome.class);
+                Intent intent = new Intent(mediaActivity.this, homeActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 mediaPlayer.stop();
@@ -321,6 +347,47 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
         }
 
         unregisterReceiver(broadcastReceiver);
+    }
+    public void play(){
+        if (!(noInternet.isInternetAvailable(getApplicationContext()))) //returns true if internet available
+        {
+            Toast.makeText(getApplicationContext(), "Check your internet Connection", Toast.LENGTH_SHORT).show();
+        } else {
+
+
+            Toast.makeText(getApplicationContext(), "Playing sound", Toast.LENGTH_SHORT).show();
+            mediaPlayer.start();
+            finalTime = mediaPlayer.getDuration();
+            startTime = mediaPlayer.getCurrentPosition();
+            seekbar.setMax((int) finalTime);
+
+          /*  if (oneTimeOnly == 0) {
+                seekbar.setMax((int) finalTime);
+                oneTimeOnly = 1;
+            }*/
+            tv_endTime.setText(String.format("%d min, %d sec",
+                    TimeUnit.MILLISECONDS.toMinutes((long) finalTime),
+                    TimeUnit.MILLISECONDS.toSeconds((long) finalTime) -
+                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long)
+                                    finalTime)))
+            );
+
+            tv_startTime.setText(String.format("%d min, %d sec",
+                    TimeUnit.MILLISECONDS.toMinutes((long) startTime),
+                    TimeUnit.MILLISECONDS.toSeconds((long) startTime) -
+                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long)
+                                    startTime)))
+            );
+
+            seekbar.setProgress((int) startTime);
+            myHandler.postDelayed(UpdateSongTime, 100);
+            iv_play.setVisibility(View.GONE);
+            iv_pause.setVisibility(View.VISIBLE);
+            if(seekbar.getProgress() == finalTime){
+                iv_play.setVisibility(View.VISIBLE);
+                iv_pause.setVisibility(View.GONE);
+            }
+        }
     }
 
 

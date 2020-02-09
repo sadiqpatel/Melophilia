@@ -29,23 +29,11 @@ public class audioModel implements Serializable {
     public String songWriter;
     public String songId;
     public String songKey;
+    public String songImg;
 
-    public String getSongId() {
-        return songId;
+    public String getSongImg() {
+        return songImg;
     }
-
-    public String getSongKey() {
-        return songKey;
-    }
-
-    public audioModel(String songUri, String songTitle, String songWriter, String songId, String songKey) {
-        this.songUri = songUri;
-        this.songTitle = songTitle;
-        this.songWriter = songWriter;
-        this.songId = songId;
-        this.songKey = songKey;
-    }
-
 
     public void setSongUri(String songUri) {
         this.songUri = songUri;
@@ -66,4 +54,28 @@ public class audioModel implements Serializable {
     public void setSongKey(String songKey) {
         this.songKey = songKey;
     }
+
+    public void setSongImg(String songImg) {
+        this.songImg = songImg;
+    }
+
+    public String getSongId() {
+        return songId;
+    }
+
+    public String getSongKey() {
+        return songKey;
+    }
+
+    public audioModel(String songUri,String songImg, String songTitle, String songWriter, String songId, String songKey) {
+        this.songUri = songUri;
+        this.songTitle = songTitle;
+        this.songWriter = songWriter;
+        this.songId = songId;
+        this.songKey = songKey;
+        this.songImg = songImg;
+    }
+
+
+
 }

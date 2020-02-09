@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.melophilia">
-    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
@@ -11,9 +12,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MediaPlayer.mediaActivity"
-            android:parentActivityName=".Admin.adminHome"
-            ></activity>
+        <activity android:name=".Home.homeActivity"></activity>
+        <activity
+            android:name=".MediaPlayer.mediaActivity"
+            android:parentActivityName=".Home.homeActivity" />
         <activity android:name=".SplashScreen.splashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,11 +24,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".Authentication.authenticationActivity" />
-        <activity android:name=".User.userHome" />
         <activity
             android:name=".Authentication.forgotPasswordActivity"
             android:parentActivityName=".Authentication.loginActivity" />
-        <activity android:name=".Admin.adminHome"></activity>
+        <activity android:name=".Admin.adminHome" />
         <activity android:name=".Authentication.loginActivity" />
         <activity android:name=".Authentication.registerActivity" />
         <activity android:name=".MainActivity" />
