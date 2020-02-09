@@ -244,11 +244,7 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
             iv_play.setVisibility(View.VISIBLE);
         } else if (view == iv_play) {
 
-            if (isPlaying){
-                onTrackPause();
-            } else {
-                onTrackPlay();
-            }
+
 
             play();
         } else if (view == iv_forward) {
@@ -354,7 +350,11 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
             Toast.makeText(getApplicationContext(), "Check your internet Connection", Toast.LENGTH_SHORT).show();
         } else {
 
-
+            if (isPlaying){
+                onTrackPause();
+            } else {
+                onTrackPlay();
+            }
             Toast.makeText(getApplicationContext(), "Playing sound", Toast.LENGTH_SHORT).show();
             mediaPlayer.start();
             finalTime = mediaPlayer.getDuration();
