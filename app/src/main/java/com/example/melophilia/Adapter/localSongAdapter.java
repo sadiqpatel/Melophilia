@@ -71,7 +71,7 @@ public class localSongAdapter extends RecyclerView.Adapter<localSongAdapter.View
 
                         // name match condition. this might differ depending on your requirement
                         // here we are looking for name or phone number match
-                        if (row.getSongTitle().toLowerCase().contains(charString.toLowerCase()) || row.getSongWriter().contains(charSequence)) {
+                        if (row.getSongTitle().toLowerCase().contains(charString.toLowerCase())) {
                             filteredList.add(row);
                         }
                     }
