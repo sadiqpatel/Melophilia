@@ -60,7 +60,7 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
 
     NotificationManager notificationManager;
     int position = 0;
-    boolean isPlaying = false;
+    boolean isPlaying = true;
 
     List<audioModel> tracks;
     String title, myUri, artist;
@@ -72,6 +72,12 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_media);
         progressDialog();
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            createChannel();
+            registerReceiver(broadcastReceiver, new IntentFilter("TRACKS_TRACKS"));
+            startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
+        }
+
         Intent intent = getIntent();
         title = intent.getStringExtra("title");
         myUri = intent.getStringExtra("uri");
@@ -82,19 +88,13 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
         tracks = (List<audioModel>) intent.getSerializableExtra("audio");
 
         init();
-        Glide
-                .with(getApplicationContext())
+        Glide.with(getApplicationContext())
                 .load(songImg)
                 .centerCrop()
                 .placeholder(R.drawable.demo)
                 .into(iv_songImg);
         mediaPlayerInit();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            createChannel();
-            registerReceiver(broadcastReceiver, new IntentFilter("TRACKS_TRACKS"));
-            startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
-        }
     }
 
     private void progressDialog() {
@@ -105,6 +105,7 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
 
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void mediaPlayerInit() {
         uri = Uri.parse(myUri);
         mediaPlayer = new MediaPlayer();
@@ -122,7 +123,7 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
                 progressDialog.dismiss();
-                play();
+                onTrackPlay();
 
             }
         });
@@ -228,38 +229,52 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onClick(View view) {
         if (view == iv_rewind) {
-            int temp = (int) startTime;
-
-            if ((temp - backwardTime) > 0) {
-                startTime = startTime - backwardTime;
-                mediaPlayer.seekTo((int) startTime);
-                Toast.makeText(getApplicationContext(), "You have rewind backward 5 seconds", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getApplicationContext(), "Cannot rewind backward 5 seconds", Toast.LENGTH_SHORT).show();
-            }
+            onTrackPrevious();
         } else if (view == iv_pause) {
-            Toast.makeText(getApplicationContext(), "Pausing sound", Toast.LENGTH_SHORT).show();
-            mediaPlayer.pause();
-            iv_pause.setVisibility(View.GONE);
-            iv_play.setVisibility(View.VISIBLE);
+            onTrackPause();
         } else if (view == iv_play) {
-
-
-
-            play();
-        } else if (view == iv_forward) {
-            int temp = (int) startTime;
-
-            if ((temp + forwardTime) <= finalTime) {
-                startTime = startTime + forwardTime;
-                mediaPlayer.seekTo((int) startTime);
-                Toast.makeText(getApplicationContext(), "You have forwarded 5 seconds", Toast.LENGTH_SHORT).show();
+            if (isPlaying){
+                onTrackPause();
             } else {
-                Toast.makeText(getApplicationContext(), "Cannot forward 5 seconds", Toast.LENGTH_SHORT).show();
+                onTrackPlay();
             }
+        } else if (view == iv_forward) {
+            onTrackNext();
         }
 
     }
+
+    private void next() {
+        int temp = (int) startTime;
+
+        if ((temp + forwardTime) <= finalTime) {
+            startTime = startTime + forwardTime;
+            mediaPlayer.seekTo((int) startTime);
+            Toast.makeText(getApplicationContext(), "You have forwarded 5 seconds", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Cannot forward 5 seconds", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void pause() {
+        Toast.makeText(getApplicationContext(), "Pausing sound", Toast.LENGTH_SHORT).show();
+        mediaPlayer.pause();
+        iv_pause.setVisibility(View.GONE);
+        iv_play.setVisibility(View.VISIBLE);
+    }
+
+    private void rewind() {
+        int temp = (int) startTime;
+
+        if ((temp - backwardTime) > 0) {
+            startTime = startTime - backwardTime;
+            mediaPlayer.seekTo((int) startTime);
+            Toast.makeText(getApplicationContext(), "You have rewind backward 5 seconds", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Cannot rewind backward 5 seconds", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -301,38 +316,38 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onTrackPrevious() {
-
         position--;
-        CreateNotification.createNotification(mediaActivity.this, tracks.get(position),
-                R.drawable.ic_pause_black_24dp, position, tracks.size()-1);
+        CreateNotification.createNotification(mediaActivity.this, title, artist,
+                R.drawable.ic_pause_black_24dp, position);
+        rewind();
 
     }
 
     @Override
     public void onTrackPlay() {
 
-        CreateNotification.createNotification(mediaActivity.this, tracks.get(position),
-                R.drawable.ic_pause_black_24dp, position, tracks.size()-1);
+        CreateNotification.createNotification(mediaActivity.this, title, artist,
+                R.drawable.ic_pause_black_24dp, position);
+        play();
         isPlaying = true;
-
     }
 
     @Override
     public void onTrackPause() {
 
-        CreateNotification.createNotification(mediaActivity.this, tracks.get(position),
-                R.drawable.ic_play_arrow_black_24dp, position, tracks.size()-1);
+        CreateNotification.createNotification(mediaActivity.this, title, artist,
+                R.drawable.ic_play_arrow_black_24dp, position);
+        pause();
         isPlaying = false;
-
     }
 
     @Override
     public void onTrackNext() {
 
         position++;
-        CreateNotification.createNotification(mediaActivity.this, tracks.get(position),
-                R.drawable.ic_pause_black_24dp, position, tracks.size()-1);
-
+        CreateNotification.createNotification(mediaActivity.this, title, artist,
+                R.drawable.ic_pause_black_24dp, position);
+        next();
     }
 
     @Override
@@ -350,11 +365,6 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
             Toast.makeText(getApplicationContext(), "Check your internet Connection", Toast.LENGTH_SHORT).show();
         } else {
 
-            if (isPlaying){
-                onTrackPause();
-            } else {
-                onTrackPlay();
-            }
             Toast.makeText(getApplicationContext(), "Playing sound", Toast.LENGTH_SHORT).show();
             mediaPlayer.start();
             finalTime = mediaPlayer.getDuration();

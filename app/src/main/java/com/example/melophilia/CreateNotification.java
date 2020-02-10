@@ -25,7 +25,7 @@ public class CreateNotification {
 
     public static Notification notification;
 
-    public static void createNotification(Context context, audioModel track, int playbutton, int pos, int size){
+    public static void createNotification(Context context, String trackTitle, String trackWriter, int playbutton, int pos){
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
 
@@ -54,22 +54,24 @@ public class CreateNotification {
 
             PendingIntent pendingIntentNext;
             int drw_next;
-            if (pos == size){
+           /* if (pos == size){
                 pendingIntentNext = null;
                 drw_next = 0;
             } else {
-                Intent intentNext = new Intent(context, NotificationActionService.class)
-                        .setAction(ACTION_NEXT);
-                pendingIntentNext = PendingIntent.getBroadcast(context, 0,
-                        intentNext, PendingIntent.FLAG_UPDATE_CURRENT);
-                drw_next = R.drawable.ic_skip_next_black_24dp;
-            }
+
+            }*/
+
+            Intent intentNext = new Intent(context, NotificationActionService.class)
+                    .setAction(ACTION_NEXT);
+            pendingIntentNext = PendingIntent.getBroadcast(context, 0,
+                    intentNext, PendingIntent.FLAG_UPDATE_CURRENT);
+            drw_next = R.drawable.ic_skip_next_black_24dp;
 
             //create notification
             notification = new NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_music_note)
-                    .setContentTitle(track.getSongTitle())
-                    .setContentText(track.getSongWriter())
+                    .setContentTitle(trackTitle)
+                    .setContentText(trackWriter)
                     .setLargeIcon(icon)
                     .setOnlyAlertOnce(true)//show notification for only first time
                     .setShowWhen(false)
