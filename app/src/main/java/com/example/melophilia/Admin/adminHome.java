@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -12,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -34,6 +37,7 @@ import android.widget.Toast;
 import com.example.melophilia.Adapter.adminSongAdapter;
 import com.example.melophilia.Authentication.loginActivity;
 import com.example.melophilia.CustomItemClickListener;
+import com.example.melophilia.MainActivity;
 import com.example.melophilia.R;
 import com.example.melophilia.Model.audioModel;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -65,7 +69,7 @@ public class adminHome extends AppCompatActivity {
     FloatingActionButton floatingActionButton;
     String tvSongName;
     TextView tv_songName, tv_song;
-    public ArrayList<audioModel> audioModels = new ArrayList<>();
+    public ArrayList<audioModel> audioModels;
     public RecyclerView rv_songList;
     public adminSongAdapter adminSongAdapter;
     FirebaseAuth mAuth;
@@ -99,7 +103,7 @@ public class adminHome extends AppCompatActivity {
         //Adding recyclerview and connecting it to a layout manager.
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         rv_songList.setLayoutManager(layoutManager);
-
+        audioModels = new ArrayList<>();
         //Passing data to localSongAdapter constructor and setting the localSongAdapter.
         adminSongAdapter = new adminSongAdapter(getApplicationContext(), audioModels, new CustomItemClickListener() {
             @Override
@@ -151,6 +155,33 @@ public class adminHome extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.home_menu, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+
+        SearchManager searchManager = (SearchManager) adminHome.this.getSystemService(Context.SEARCH_SERVICE);
+
+        SearchView searchView = null;
+        if (searchItem != null) {
+            searchView = (SearchView) searchItem.getActionView();
+        }
+        if (searchView != null) {
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(adminHome.this.getComponentName()));
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    // filter recycler view when query submitted
+                    adminSongAdapter.getFilter().filter(query);
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String query) {
+                    // filter recycler view when text is changed
+                    adminSongAdapter.getFilter().filter(query);
+                    return false;
+                }
+            });
+        }
         return true;
     }
 
