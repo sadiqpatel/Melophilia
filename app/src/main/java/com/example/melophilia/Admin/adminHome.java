@@ -391,8 +391,8 @@ public class adminHome extends AppCompatActivity {
     private void uploadFile_rd(String audioURL, String songTitle, String songWriter, String songKey) {
 String img ="";
         String mSongId = mDatabase.push().getKey();
-        audioModel audio = new audioModel(audioURL,img, songTitle, songWriter, mSongId, songKey);
-        mDatabase.child(mSongId).setValue(audio);
+     //   audioModel audio = new audioModel(audioURL,img, songTitle, songWriter, mSongId, songKey);
+    //    mDatabase.child(mSongId).setValue(audio);
     }
 
     public void openDialog() {

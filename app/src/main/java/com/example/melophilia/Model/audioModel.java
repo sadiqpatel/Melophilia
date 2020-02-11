@@ -30,6 +30,7 @@ public class audioModel implements Serializable {
     public String songId;
     public String songKey;
     public String songImg;
+    public int count;
 
     public String getSongImg() {
         return songImg;
@@ -67,13 +68,22 @@ public class audioModel implements Serializable {
         return songKey;
     }
 
-    public audioModel(String songUri,String songImg, String songTitle, String songWriter, String songId, String songKey) {
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    public audioModel(String songUri, String songImg, String songTitle, String songWriter, String songId, String songKey, int count) {
         this.songUri = songUri;
         this.songTitle = songTitle;
         this.songWriter = songWriter;
         this.songId = songId;
         this.songKey = songKey;
         this.songImg = songImg;
+        this.count = count;
     }
 
 

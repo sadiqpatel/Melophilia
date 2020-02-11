@@ -128,7 +128,7 @@ public class songUploadFragment extends Fragment {
 
             @Override
             public void onItemPlay(audioModel audioModel) {
-
+                uploadFile_rdCount(audioModel.getSongId(), audioModel.getSongUri(), audioModel.getSongImg(), audioModel.getSongTitle(), audioModel.getSongWriter(), audioModel.getSongKey(), audioModel.getCount()+1);
             }
         });
         rv_songList.setAdapter(adminSongAdapter);
@@ -346,16 +346,21 @@ public class songUploadFragment extends Fragment {
 
 
     public void upload(String imgURL, String audioUrl, String songTitle, String songWriter, String songKey) {
-        uploadFile_rd(audioUrl, imgURL, songTitle, songWriter, songKey);
+        uploadFile_rd(audioUrl, imgURL, songTitle, songWriter, songKey, 0);
         progressDialog.dismiss();
         Toast.makeText(getContext(), "File Uploaded Successfully", Toast.LENGTH_SHORT).show();
     }
 
-    private void uploadFile_rd(String audioURL, String imgRef, String songTitle, String songWriter, String songKey) {
+    private void uploadFile_rd(String audioURL, String imgRef, String songTitle, String songWriter, String songKey, int count) {
         String mSongId = mDatabase.push().getKey();
-        audioModel audio = new audioModel(audioURL, imgRef, songTitle, songWriter, mSongId, songKey);
+        audioModel audio = new audioModel(audioURL, imgRef, songTitle, songWriter, mSongId, songKey, count);
         mDatabase.child(mSongId).setValue(audio);
     }
+    private void uploadFile_rdCount(String id, String audioURL, String imgRef, String songTitle, String songWriter, String songKey, int count) {
+        audioModel audio = new audioModel(audioURL, imgRef, songTitle, songWriter, id, songKey, count);
+        mDatabase.child(id).setValue(audio);
+    }
+
 
     public void openDialog() {
         final View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_dialog_add_songs, null);

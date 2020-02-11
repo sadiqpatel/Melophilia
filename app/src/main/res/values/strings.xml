@@ -42,5 +42,7 @@
     <string name="latest_albums">Latest Albums</string>
     <string name="top_songs">Top Songs</string>
     <string name="showmore">Show All</string>
+    <string name="most_streamed_songs">Most streamed songs</string>
+    <string name="logout">Logout</string>
 
 </resources>

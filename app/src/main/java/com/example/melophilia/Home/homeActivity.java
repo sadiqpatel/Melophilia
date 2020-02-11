@@ -17,6 +17,7 @@ import android.view.View;
 import com.example.melophilia.Adapter.tabAdapter;
 import com.example.melophilia.Admin.adminHome;
 import com.example.melophilia.Authentication.loginActivity;
+import com.example.melophilia.MostStreamedSongs;
 import com.example.melophilia.R;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -85,6 +86,10 @@ public class homeActivity extends AppCompatActivity {
                 FirebaseAuth.getInstance().signOut();
                 startActivity(new Intent(homeActivity.this, loginActivity.class));
                 finish();
+                return true;
+
+            case R.id.item_count:
+                startActivity(new Intent(homeActivity.this, MostStreamedSongs.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
