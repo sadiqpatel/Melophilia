@@ -25,6 +25,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class MostStreamedSongs extends AppCompatActivity {
     private ArrayList<audioModel> audioList;
@@ -67,6 +69,13 @@ public class MostStreamedSongs extends AppCompatActivity {
                 for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
                     audioModel audio = dataSnapshot1.getValue(audioModel.class);
                     audioList.add(audio);
+                    Collections.sort(audioList, new Comparator<audioModel>() {
+                        @Override
+                        public int compare(audioModel lhs, audioModel rhs) {
+                            // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                            return lhs.getCount() > rhs.getCount() ? -1 : (lhs.count < rhs.count ) ? 1 : 0;
+                        }
+                    });
                     progressDialog.dismiss();
                 }
                 mostStremedSongAdapter.notifyDataSetChanged();
