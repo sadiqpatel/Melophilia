@@ -16,7 +16,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -36,7 +35,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.melophilia.Adapter.adminSongAdapter;
-import com.example.melophilia.Admin.adminHome;
 import com.example.melophilia.CustomItemClickListener;
 import com.example.melophilia.Model.audioModel;
 import com.example.melophilia.R;
@@ -53,17 +51,16 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 import static android.app.Activity.RESULT_OK;
 
 public class songUploadFragment extends Fragment {
 
-    private final static String TAG = adminHome.class.getName();
     //All variables and object declarations here.
+    private final static String TAG = songUploadFragment.class.getName();
+
     public static final int PICK_SONG_RESULT = 1;
     public static final int PICK_IMAGE_RESULT = 2;
     private static final int MY_PERMISSIONS_REQUEST_READ = 1;
@@ -90,10 +87,12 @@ public class songUploadFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_song_upload, container, false);
-        mAuth = FirebaseAuth.getInstance();
+
         //Adding firebase reference.
+        mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference("Audio");
         setHasOptionsMenu(true);
 
@@ -107,10 +106,12 @@ public class songUploadFragment extends Fragment {
         tv_song = view.findViewById(R.id.tv_songs);
         rv_songList = view.findViewById(R.id.rv_songList);
 
+        //If user logins than hide floating button.
         if (!(mAuth.getCurrentUser().getEmail().equals("admin12345@gmail.com"))) {
             floatingActionButton.setVisibility(View.GONE);
 
         }
+
         //Adding recyclerview and connecting it to a layout manager.
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         rv_songList.setLayoutManager(layoutManager);
@@ -128,7 +129,7 @@ public class songUploadFragment extends Fragment {
 
             @Override
             public void onItemPlay(audioModel audioModel) {
-                uploadFile_rdCount(audioModel.getSongId(), audioModel.getSongUri(), audioModel.getSongImg(), audioModel.getSongTitle(), audioModel.getSongWriter(), audioModel.getSongKey(), audioModel.getCount()+1);
+                uploadFile_rdCount(audioModel.getSongId(), audioModel.getSongUri(), audioModel.getSongImg(), audioModel.getSongTitle(), audioModel.getSongWriter(), audioModel.getSongKey(), audioModel.getCount() + 1);
             }
         });
         rv_songList.setAdapter(adminSongAdapter);
@@ -174,11 +175,13 @@ public class songUploadFragment extends Fragment {
         });
     }
 
+    //Admin functionality for choosing and uploading song using intent.
     public void chooseSong() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("audio/*");
         startActivityForResult(intent, PICK_SONG_RESULT);
     }
+    //Admin functionality for choosing and uploading image using intent.
 
     public void chooseImage() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -202,6 +205,7 @@ public class songUploadFragment extends Fragment {
         }
     }
 
+    //Get the song from local storage
     public String getFileName(Uri uri) {
         String result = null;
         if (uri.getScheme().equals("content")) {
@@ -343,8 +347,6 @@ public class songUploadFragment extends Fragment {
     }
 
 
-
-
     public void upload(String imgURL, String audioUrl, String songTitle, String songWriter, String songKey) {
         uploadFile_rd(audioUrl, imgURL, songTitle, songWriter, songKey, 0);
         progressDialog.dismiss();
@@ -356,12 +358,14 @@ public class songUploadFragment extends Fragment {
         audioModel audio = new audioModel(audioURL, imgRef, songTitle, songWriter, mSongId, songKey, count);
         mDatabase.child(mSongId).setValue(audio);
     }
+
     private void uploadFile_rdCount(String id, String audioURL, String imgRef, String songTitle, String songWriter, String songKey, int count) {
         audioModel audio = new audioModel(audioURL, imgRef, songTitle, songWriter, id, songKey, count);
         mDatabase.child(id).setValue(audio);
     }
 
 
+    //Dialog method which gets opened on adding song.
     public void openDialog() {
         final View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_dialog_add_songs, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -421,6 +425,8 @@ public class songUploadFragment extends Fragment {
         });
     }
 
+
+    //Confirm delete dialog.
     public void confirmDeleteDialog(final String data, final String songId) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -444,6 +450,8 @@ public class songUploadFragment extends Fragment {
         alertDialog.show();
     }
 
+
+    //Search functionality
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         MenuItem searchItem = menu.findItem(R.id.action_search);
@@ -455,7 +463,7 @@ public class songUploadFragment extends Fragment {
             searchView = (androidx.appcompat.widget.SearchView) searchItem.getActionView();
         }
         if (searchView != null) {
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(((Activity)getContext()).getComponentName()));
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(((Activity) getContext()).getComponentName()));
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
@@ -472,7 +480,7 @@ public class songUploadFragment extends Fragment {
                 }
             });
         }
-        super.onCreateOptionsMenu(menu,inflater);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override

@@ -61,6 +61,9 @@ public class songLocalFragment extends Fragment {
         getAllAudioFromDevice(getContext());
         return view;
     }
+
+
+    //Gets locally song stored
     public void getAllAudioFromDevice(final Context context) {
 
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -95,6 +98,8 @@ public class songLocalFragment extends Fragment {
         }
     }
 
+
+    //Search funtionality
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         MenuItem searchItem = menu.findItem(R.id.action_search);

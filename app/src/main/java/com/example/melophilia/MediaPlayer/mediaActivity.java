@@ -27,15 +27,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.example.melophilia.Admin.adminHome;
 import com.example.melophilia.CreateNotification;
-import com.example.melophilia.CustomItemClickListener;
 import com.example.melophilia.Home.homeActivity;
-import com.example.melophilia.MainActivity;
 import com.example.melophilia.Model.audioModel;
 import com.example.melophilia.R;
 import com.example.melophilia.Service.OnClearFromRecentService;
-import com.example.melophilia.Track;
 import com.example.melophilia.utils.noInternet;
 
 import java.io.IOException;
@@ -70,7 +66,10 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_media);
+
+
         progressDialog();
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             createChannel();
@@ -307,6 +306,7 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
         }
     };
 
+    //Method which will be called when back button is pressed.
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -314,6 +314,8 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
         finish();
     }
 
+
+    //method of notification song
     @Override
     public void onTrackPrevious() {
         position--;
@@ -323,6 +325,7 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
 
     }
 
+    //method of notification song
     @Override
     public void onTrackPlay() {
 
@@ -332,6 +335,7 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
         isPlaying = true;
     }
 
+    //method of notification song
     @Override
     public void onTrackPause() {
 
@@ -341,6 +345,7 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
         isPlaying = false;
     }
 
+    //method of notification song
     @Override
     public void onTrackNext() {
 
@@ -350,6 +355,7 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
         next();
     }
 
+    //method of notification song
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -359,6 +365,9 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
 
         unregisterReceiver(broadcastReceiver);
     }
+
+
+    //Method which is called when play button is clicked
     public void play(){
         if (!(noInternet.isInternetAvailable(getApplicationContext()))) //returns true if internet available
         {
@@ -402,6 +411,9 @@ public class mediaActivity extends AppCompatActivity implements View.OnClickList
 
 
 }
+
+
+//Interface created for notifications of song
 interface Playable {
     void onTrackPrevious();
     void onTrackPlay();

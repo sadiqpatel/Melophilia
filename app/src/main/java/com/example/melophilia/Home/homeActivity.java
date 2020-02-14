@@ -12,10 +12,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.example.melophilia.Adapter.tabAdapter;
-import com.example.melophilia.Admin.adminHome;
 import com.example.melophilia.Authentication.loginActivity;
 import com.example.melophilia.MostStreamedSongs;
 import com.example.melophilia.R;
@@ -95,10 +93,16 @@ public class homeActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
+    //Method when pressed back button
     public void onBackPressed() {
         confirmExitDialog();
 
     }
+
+
+    //Dialog for are you sure you want to exit.
     public void confirmExitDialog() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

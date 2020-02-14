@@ -15,6 +15,9 @@
         android:theme="@style/AppTheme">
         <activity android:name=".MostStreamedSongs"></activity>
         <activity android:name=".Home.homeActivity" />
+        <activity android:name=".Theme.themeActivity"
+            android:parentActivityName=".Home.homeActivity"
+            ></activity>
         <activity
             android:name=".MediaPlayer.mediaActivity"
             android:parentActivityName=".Home.homeActivity" />
@@ -29,7 +32,6 @@
         <activity
             android:name=".Authentication.forgotPasswordActivity"
             android:parentActivityName=".Authentication.loginActivity" />
-        <activity android:name=".Admin.adminHome" />
         <activity android:name=".Authentication.loginActivity" />
         <activity android:name=".Authentication.registerActivity" />
         <activity android:name=".MainActivity" />

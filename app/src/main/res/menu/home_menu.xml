@@ -7,6 +7,10 @@
         app:showAsAction="always|collapseActionView"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         android:title="Search"/>
+    <item
+        android:title="settings"
+        android:id="@+id/item_settings"
+        />
 
     <item
         android:title="@string/most_streamed_songs"
